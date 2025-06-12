@@ -1,12 +1,22 @@
 "use client";
+
+import type { TaskList, TaskListNames } from "./types";
+
 type AddTaskFormProps = {
   taskTitle: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  taskLists: TaskList;
+  onTaskTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onTaskListChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onTaskListSelect: (e: React.MouseEvent<HTMLSelectElement>) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 };
+
 export default function AddTaskForm({
   taskTitle,
-  onChange,
+  taskLists,
+  onTaskTitleChange,
+  onTaskListChange,
+  onTaskListSelect,
   onSubmit,
 }: AddTaskFormProps) {
   return (
@@ -26,7 +36,7 @@ export default function AddTaskForm({
         id="newTaskTitle"
         placeholder="New Task Title"
         value={taskTitle}
-        onChange={onChange}
+        onChange={onTaskTitleChange}
         className="border-2 border-gray-300 rounded-md p-2"
         autoFocus
       />
@@ -37,7 +47,16 @@ export default function AddTaskForm({
         name="taskListMenu"
         id="taskListMenu"
         className="border-2 border-gray-300 rounded-md p-2 mt-4"
-      ></select>
+      >
+        <option value="" disabled selected>
+          Select Task List
+        </option>
+        {Object.keys(taskLists).map((taskListName) => (
+          <option key={taskListName} value={taskListName}>
+            {taskListName}
+          </option>
+        ))}
+      </select>
     </form>
   );
 }
