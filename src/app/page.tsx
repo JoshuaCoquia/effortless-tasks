@@ -1,19 +1,25 @@
-export default function Home() {
-  return (
-   <main>
-    <h1 className="hidden">Effortless Tasks</h1>
-    {/* Add Task Form */}
-    <form>
-      <button type="submit" className="bg-blue-500 text-foreground rounded-md p-2 mr-2">Add Task</button>
-      <label htmlFor="newTaskTitle" className="hidden">Task List to Select</label>
-      <input type="text" name="newTaskTitle" id="newTaskTitle" placeholder="New Task Title" className="border-2 border-gray-300 rounded-md p-2" autoFocus />
-      <label htmlFor="taskListMenu" className="hidden">Task List to Select</label>
-      <select name="taskListMenu" id="taskListMenu" className="border-2 border-gray-300 rounded-md p-2 mt-4">
+'use client';
 
-      </select>
-    </form>
-    {/* Dropdown menu to select task list */}
-    {/* Task list */}
-   </main> 
+import { useState } from "react";
+import AddTaskForm from "./AddTaskForm";
+import TaskList from "./TaskList";
+
+export default function Home() {
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [taskList, setTaskList] = useState("");
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    // TODO: Add logic to add the task to the task list
+  }
+
+  return (
+    <main>
+      <h1 className="hidden">Effortless Tasks</h1>
+      {/* Add task form */}
+      <AddTaskForm taskTitle={newTaskTitle} onChange={(e) => {setNewTaskTitle(e.target.value)}} onSubmit={handleSubmit} />
+      {/* Dropdown menu to select task list */}
+      {/* Task list */}
+      <TaskList tasks={[]} />
+    </main>
   );
 }
