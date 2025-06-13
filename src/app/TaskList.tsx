@@ -1,4 +1,6 @@
 import type { TaskData } from "./types";
+import Image from "next/image";
+import CheckIcon from "@/images/check_16dp_090B0D_FILL0_wght400_GRAD0_opsz20.svg";
 
 type TaskListProps = {
   title: string;
@@ -21,8 +23,8 @@ export default function TaskList({
           <li key={task.id}>
             <button onClick={() => {
               onTaskButtonClick(task.id);
-            }}>
-              {task.completed ? "(X)" : "( )"}
+            }} className="w-4 h-4">
+            
             </button> <input
               type="text"
               value={task.title}

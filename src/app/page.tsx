@@ -103,7 +103,7 @@ export default function Home() {
         {allTaskLists.map((taskList) => (
           <li key={taskList.id}>
             <TaskListView
-              title={taskList.title.concat(" ", taskList.id)}
+              title={taskList.title}
               tasks={allTasks.filter((task) => task.parentTaskListId === taskList.id)}
               onTaskButtonClick={handleTaskButtonClick}
               onTaskTextUpdate={handleTaskTextUpdate}

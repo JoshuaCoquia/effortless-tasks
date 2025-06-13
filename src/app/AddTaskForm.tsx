@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import addCircle from "@/images/add_circle_16dp_090B0D_FILL0_wght400_GRAD0_opsz20.svg";
 import type { TaskList } from "./types";
 
 type AddTaskFormProps = {
@@ -24,7 +26,7 @@ export default function AddTaskForm({
         type="submit"
         className="bg-blue-300 text-foreground rounded-md p-2 mr-2"
       >
-        Add Task
+        <Image src={addCircle} width={16} height={16} alt="Add Task" />
       </button>
       <label htmlFor="newTaskTitle" className="hidden">
         New Task Title
@@ -43,22 +45,18 @@ export default function AddTaskForm({
         Task List to Select
       </label>
       <br />
-      <select
-        name="taskListMenu"
-        id="taskListMenu"
-      >
-       {
-        taskLists.map((taskList) => (
-          <option
-            key={taskList.id}
-            value={taskList.id}
-          >
+      <select name="taskListMenu" id="taskListMenu">
+        {taskLists.map((taskList) => (
+          <option key={taskList.id} value={taskList.id}>
             {taskList.title}
           </option>
-        ))
-       } 
+        ))}
       </select>
-      <button type="button" onClick={onCreateNewTaskList} className="rounded-md p-2 mt-4">
+      <button
+        type="button"
+        onClick={onCreateNewTaskList}
+        className=""
+      >
         (Create New Task List)
       </button>
     </form>
