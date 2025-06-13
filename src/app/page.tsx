@@ -1,21 +1,28 @@
 "use client";
 
-import type { TaskLists } from "./types";
+import type { TaskData, TaskList } from "./types";
 import { useState } from "react";
 import AddTaskForm from "./AddTaskForm";
-import TaskList from "./TaskList";
+import TaskListView from "./TaskList";
 
 export default function Home() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [currentTaskNumber, setCurrentTaskNumber] = useState(1);
   const [currentTaskListNumber, setCurrentTaskListNumber] = useState(1);
-  const [allTaskLists, setAllTaskLists] = useState<TaskLists>([
+  const [allTaskLists, setAllTaskLists] = useState<TaskList[]>([
     {
       id: "list_0",
       title: "Default",
-      tasks: [{ id: "task_0", title: "Example Task" }],
     },
   ]);
+  const [allTasks, setAllTasks] = useState<TaskData[]>([
+    {
+      id: "task_0",
+      title: "Example Task",
+      parentTaskListId: "list_0",
+    },
+  ]);
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -25,15 +32,17 @@ export default function Home() {
       (taskList) => taskList.id === taskListID
     );
     if (taskList) {
-      const newTask = {
+      const newTask: TaskData = {
         id: "task_".concat(currentTaskNumber.toString()),
         title: taskTitle,
+        parentTaskListId: taskListID,
       };
-      taskList.tasks.push(newTask);
       setCurrentTaskNumber(currentTaskNumber + 1);
+      setAllTasks([...allTasks, newTask]);
+      setNewTaskTitle("");
     }
-    setNewTaskTitle("");
   }
+
   function handleNewTaskList(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     const newTaskListName = prompt("Enter new task list name:");
@@ -43,12 +52,39 @@ export default function Home() {
         {
           id: "list_".concat(currentTaskListNumber.toString()),
           title: newTaskListName,
-          tasks: [],
         },
       ]);
       setCurrentTaskListNumber(currentTaskListNumber + 1);
     }
   }
+
+  function handleTaskButtonClick(taskId: string) {
+    setAllTasks(allTasks.map(task => {
+      if (task.id === taskId) {
+        const updatedTaskCompletion = task.completed ? false : true;
+        return {
+          ...task,
+          completed: updatedTaskCompletion,
+        }
+      } else {
+        return task;
+      }
+    }))
+  }
+
+  function handleTaskTextUpdate(taskId: string, e: React.ChangeEvent<HTMLInputElement>) {
+    setAllTasks(allTasks.map(task => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          title: e.target.value,
+        }
+      } else {
+        return task;
+      }
+    }))
+  }
+
   return (
     <main>
       <h1 className="hidden">Effortless Tasks</h1>
@@ -62,14 +98,15 @@ export default function Home() {
         onSubmit={handleSubmit}
         onCreateNewTaskList={handleNewTaskList}
       />
-      {/* Dropdown menu to select task list */}
       {/* Task list */}
       <ul>
         {allTaskLists.map((taskList) => (
           <li key={taskList.id}>
-            <TaskList
-              title={taskList.title}
-              tasks={taskList.tasks}
+            <TaskListView
+              title={taskList.title.concat(" ", taskList.id)}
+              tasks={allTasks.filter((task) => task.parentTaskListId === taskList.id)}
+              onTaskButtonClick={handleTaskButtonClick}
+              onTaskTextUpdate={handleTaskTextUpdate}
             />
           </li>
         ))}
