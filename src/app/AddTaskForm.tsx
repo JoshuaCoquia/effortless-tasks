@@ -1,22 +1,21 @@
 "use client";
 
-import type { TaskList, TaskListNames } from "./types";
+import React from "react";
+import type { TaskList } from "./types";
 
 type AddTaskFormProps = {
   taskTitle: string;
-  taskLists: TaskList;
-  onTaskTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onTaskListChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onTaskListSelect: (e: React.MouseEvent<HTMLSelectElement>) => void;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  taskLists: TaskList[];
+  onTaskTitleChange: React.ChangeEventHandler<HTMLInputElement>;
+  onCreateNewTaskList: React.MouseEventHandler<HTMLButtonElement>;
+  onSubmit: React.FormEventHandler<HTMLFormElement>;
 };
 
 export default function AddTaskForm({
   taskTitle,
   taskLists,
   onTaskTitleChange,
-  onTaskListChange,
-  onTaskListSelect,
+  onCreateNewTaskList,
   onSubmit,
 }: AddTaskFormProps) {
   return (
@@ -28,7 +27,7 @@ export default function AddTaskForm({
         Add Task
       </button>
       <label htmlFor="newTaskTitle" className="hidden">
-        Task List to Select
+        New Task Title
       </label>
       <input
         type="text"
@@ -43,20 +42,25 @@ export default function AddTaskForm({
       <label htmlFor="taskListMenu" className="hidden">
         Task List to Select
       </label>
+      <br />
       <select
         name="taskListMenu"
         id="taskListMenu"
-        className="border-2 border-gray-300 rounded-md p-2 mt-4"
       >
-        <option value="" disabled selected>
-          Select Task List
-        </option>
-        {Object.keys(taskLists).map((taskListName) => (
-          <option key={taskListName} value={taskListName}>
-            {taskListName}
+       {
+        taskLists.map((taskList) => (
+          <option
+            key={taskList.id}
+            value={taskList.id}
+          >
+            {taskList.title}
           </option>
-        ))}
+        ))
+       } 
       </select>
+      <button type="button" onClick={onCreateNewTaskList} className="rounded-md p-2 mt-4">
+        (Create New Task List)
+      </button>
     </form>
   );
 }

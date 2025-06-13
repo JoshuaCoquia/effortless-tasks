@@ -1,12 +1,8 @@
-type Task = {
-  id: number;
-  title: string;
-  completed?: boolean;
-};
+import type { TaskData } from "./types";
 
 type TaskListProps = {
   title: string;
-  tasks: Task[];
+  tasks: TaskData[];
 };
 
 export default function TaskList({ title, tasks }: TaskListProps) {

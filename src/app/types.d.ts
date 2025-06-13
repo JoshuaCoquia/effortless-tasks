@@ -1,16 +1,13 @@
 export type TaskData = {
   id: string;
   title: string;
-  completed: boolean;
+  completed?: boolean;
 }
 
 export type TaskList = {
+  id: string;
   title: string;
   tasks: TaskData[];
 }
 
-export type TaskListNames = Array<string>;
-
-export type TaskLists = {
-  [key: string]: TaskList;
-}
+export type TaskLists = Array<TaskList>;
