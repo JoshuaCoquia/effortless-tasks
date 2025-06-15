@@ -22,25 +22,30 @@ export default function AddTaskForm({
 }: AddTaskFormProps) {
   return (
     <form id="addTaskForm" onSubmit={onSubmit}>
-      <button
-        type="submit"
-        className="bg-blue-300 text-foreground rounded-md p-2 mr-2"
-      >
-        <Image src={addCircle} width={16} height={16} alt="Add Task" />
-      </button>
-      <label htmlFor="newTaskTitle" className="hidden">
-        New Task Title
-      </label>
-      <input
-        type="text"
-        name="newTaskTitle"
-        id="newTaskTitle"
-        placeholder="New Task Title"
-        value={taskTitle}
-        onChange={onTaskTitleChange}
-        className="border-2 border-gray-300 rounded-md p-2"
-        autoFocus
-      />
+      <section className="bg-grey-light-background flex m-4 p-1 items-center border-sm rounded-lg">
+        <button
+          type="submit"
+          className="rounded-md m-2"
+        >
+          <Image src={addCircle} width={24} height={24} alt="Add Task" />
+        </button>
+        <div className="w-full group pr-2">
+          <label htmlFor="newTaskTitle" className="hidden">
+            New Task Title
+          </label>
+          <input
+            type="text"
+            name="newTaskTitle"
+            id="newTaskTitle"
+            placeholder="New Task"
+            value={taskTitle}
+            onChange={onTaskTitleChange}
+            className="w-full text-black placeholder-grey outline-0"
+            autoFocus
+          />
+          <div className="block max-w-0 group-hover:max-w-full group-focus-within:max-w-full transition-all duration-400 h-[1px] bg-grey" />
+        </div>
+      </section>
       <label htmlFor="taskListMenu" className="hidden">
         Task List to Select
       </label>
