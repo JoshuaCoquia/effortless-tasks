@@ -45,7 +45,7 @@ export default function Home() {
       },
     ]);
     setCurrentTaskListNumber(currentTaskListNumber + 1);
-    allTaskLists.length >= 1 ? setIsListDeletionAllowed(true) : setIsListDeletionAllowed(false);
+    if (allTaskLists.length >= 1) { setIsListDeletionAllowed(true); } else { setIsListDeletionAllowed(false); }
   }
 
   function handleTaskButtonClick(taskId: string) {
@@ -62,7 +62,7 @@ export default function Home() {
     }))
   }
 
-  function handleTaskSubmit(taskId: string, e: React.KeyboardEvent<HTMLInputElement>) {
+  function handleTaskSubmit(taskId: string) {
     const task = allTasks.find(task => task.id === taskId);
     if (task === undefined) return;
     const list = allTaskLists.find(list => list.id === task.parentTaskListId);
@@ -97,14 +97,14 @@ export default function Home() {
 
   function handleListDelete(listId: string) {
     setAllTaskLists(allTaskLists.filter(list => list.id !== listId));
-    allTaskLists.length > 2 ? setIsListDeletionAllowed(true) : setIsListDeletionAllowed(false);
+    if (allTaskLists.length > 2) { setIsListDeletionAllowed(true); } else { setIsListDeletionAllowed(false); }
   }
 
   useEffect(() => {
     const savedLists = JSON.parse(localStorage.getItem("allTaskLists")!);
-    if (savedLists != null && savedLists.length > 0) { 
-      setAllTaskLists(savedLists); 
-    } else { 
+    if (savedLists != null && savedLists.length > 0) {
+      setAllTaskLists(savedLists);
+    } else {
       setTimeout(() => setAllTaskLists([{ id: crypto.randomUUID(), title: "Example List" }]), 0)
     }
     const savedTasks = localStorage.getItem("allTasks");
