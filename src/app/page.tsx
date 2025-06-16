@@ -79,14 +79,27 @@ export default function Home() {
           ...task,
           title: e.target.value,
         }
-      } else {
-        return task;
-      }
-    }))
+      } else { return task; }
+    }));
   }
 
   function handleTaskDelete(taskId: string) {
     setAllTasks(allTasks.filter(task => task.id !== taskId));
+  }
+
+  function handleTitleUpdate(listId: string, e: React.ChangeEvent<HTMLInputElement>) {
+    setAllTaskLists(allTaskLists.map(list => {
+      if (list.id === listId) {
+        return {
+          ...list,
+          title: e.target.value,
+        }
+      } else { return list; }
+    }));
+  }
+
+  function handleListDelete(listId: string) {
+    setAllTaskLists(allTaskLists.filter(list => list.id !== listId));
   }
 
   return (
@@ -107,11 +120,14 @@ export default function Home() {
         {allTaskLists.map((taskList) => (
           <li key={taskList.id}>
             <TaskListView
+              id={taskList.id}
               title={taskList.title}
               tasks={allTasks.filter((task) => task.parentTaskListId === taskList.id)}
               onTaskButtonClick={handleTaskButtonClick}
               onTaskTextUpdate={handleTaskTextUpdate}
               onTaskDelete={handleTaskDelete}
+              onTitleUpdate={handleTitleUpdate}
+              onListDelete={handleListDelete}
             />
           </li>
         ))}
