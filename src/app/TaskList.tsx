@@ -16,11 +16,11 @@ export default function TaskList({
   onTaskTextUpdate,
 }: TaskListProps) {
   return (
-    <div>
-      <h2>{title}</h2>
+    <div className="m-2">
+      <h2 className="font-bold text-md my-1.5">{title}</h2>
       <ul>
         {tasks.map((task) => (
-          <li key={task.id} className="hover:bg-grey-light-background focus-within:bg-grey-light-background flex items-center border-0 rounded-lg m-2 gap-2 p-2 transition-all duration-400 group">
+          <li key={task.id} className="hover:bg-grey-light-background focus-within:bg-grey-light-background flex items-center border-0 rounded-lg gap-2 p-2 transition-all duration-400 group">
             <button onClick={() => {
               onTaskButtonClick(task.id);
             }} className="w-8 h-8 border-2 rounded-lg border-grey-dark flex-none">
