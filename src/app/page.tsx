@@ -1,7 +1,7 @@
 "use client";
 
 import type { TaskData, TaskList } from "./types";
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import AddTaskForm from "./AddTaskForm";
 import TaskListView from "./TaskList";
 
@@ -9,24 +9,13 @@ export default function Home() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [currentTaskNumber, setCurrentTaskNumber] = useState(1);
   const [currentTaskListNumber, setCurrentTaskListNumber] = useState(1);
-  const [allTaskLists, setAllTaskLists] = useState<TaskList[]>([
-    {
-      id: "list_0",
-      title: "Default",
-    },
-  ]);
-  const [allTasks, setAllTasks] = useState<TaskData[]>([
-    {
-      id: "task_0",
-      title: "Example Task",
-      parentTaskListId: "list_0",
-    },
-  ]);
+  const [allTaskLists, setAllTaskLists] = useState<TaskList[]>([{ id: crypto.randomUUID(), title: "Example List" }]);
+  const [allTasks, setAllTasks] = useState<TaskData[]>([]);
   const [isListDeletionAllowed, setIsListDeletionAllowed] = useState<boolean>(false);
 
   function createNewTask(title: string, taskListId: string) {
     const newTask: TaskData = {
-      id: "task_".concat(currentTaskNumber.toString()),
+      id: crypto.randomUUID(),
       title: title,
       parentTaskListId: taskListId,
     };
@@ -51,7 +40,7 @@ export default function Home() {
     setAllTaskLists([
       ...allTaskLists,
       {
-        id: "list_".concat(currentTaskListNumber.toString()),
+        id: crypto.randomUUID(),
         title: "New List",
       },
     ]);
@@ -88,7 +77,7 @@ export default function Home() {
           title: e.target.value,
         }
       } else { return task; }
-    }));
+    }))
   }
 
   function handleTaskDelete(taskId: string) {
@@ -111,6 +100,24 @@ export default function Home() {
     allTaskLists.length > 2 ? setIsListDeletionAllowed(true) : setIsListDeletionAllowed(false);
   }
 
+  useEffect(() => {
+    const savedLists = JSON.parse(localStorage.getItem("allTaskLists")!);
+    if (savedLists != null && savedLists.length > 0) { 
+      setAllTaskLists(savedLists); 
+    } else { 
+      setTimeout(() => setAllTaskLists([{ id: crypto.randomUUID(), title: "Example List" }]), 0)
+    }
+    const savedTasks = localStorage.getItem("allTasks");
+    if (savedTasks != null && JSON.parse(JSON.stringify(savedTasks)).length > 0) { setAllTasks(JSON.parse(savedTasks)); } else { setAllTaskLists([]) }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("allTaskLists", JSON.stringify(allTaskLists));
+  }, [allTaskLists]);
+
+  useEffect(() => {
+    localStorage.setItem("allTasks", JSON.stringify(allTasks));
+  }, [allTasks]);
 
   return (
     <main>
