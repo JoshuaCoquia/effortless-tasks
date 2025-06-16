@@ -21,8 +21,8 @@ export default function AddTaskForm({
   onSubmit,
 }: AddTaskFormProps) {
   return (
-    <form id="addTaskForm" onSubmit={onSubmit}>
-      <section className="bg-grey-light-background flex m-4 p-1 items-center border-sm rounded-lg">
+    <form id="addTaskForm" className="m-4 flex flex-col gap-2" onSubmit={onSubmit}>
+      <section className="bg-grey-light-background flex p-1 items-center border-sm rounded-lg">
         <button
           type="submit"
           className="rounded-md m-2"
@@ -40,18 +40,18 @@ export default function AddTaskForm({
             placeholder="New Task"
             value={taskTitle}
             onChange={onTaskTitleChange}
-            className="w-full text-black placeholder-grey outline-0"
+            className="w-full text-black placeholder-grey outline-0 transition-all duration-150"
             autoFocus
           />
           <div className="block max-w-0 group-hover:max-w-full group-focus-within:max-w-full transition-all duration-150 h-[1px] bg-grey" />
         </div>
       </section>
       <label htmlFor="taskListMenu" className="hidden">
-        Task List to Select
+        List to Select
       </label>
-      <select name="taskListMenu" id="taskListMenu">
+      <select name="taskListMenu" id="taskListMenu" className="bg-transparent p-2 border-0 border-b-2 border-grey-light hover:border-grey focus:border-grey active:border-grey outline-0">
         {taskLists.map((taskList) => (
-          <option key={taskList.id} value={taskList.id}>
+          <option key={taskList.id} value={taskList.id} className="">
             {taskList.title}
           </option>
         ))}
@@ -59,9 +59,9 @@ export default function AddTaskForm({
       <button
         type="button"
         onClick={onCreateNewTaskList}
-        className=""
+        className="w-fit hover:bg-grey-light-background focus:bg-grey-light-background p-2 border-0 rounded-lg transition-colors duration-150 outline-0"
       >
-        (Create New Task List)
+        Create New List
       </button>
     </form>
   );
