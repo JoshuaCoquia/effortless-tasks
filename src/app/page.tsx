@@ -45,17 +45,14 @@ export default function Home() {
 
   function handleNewTaskList(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
-    const newTaskListName = prompt("Enter new task list name:");
-    if (newTaskListName) {
       setAllTaskLists([
         ...allTaskLists,
         {
           id: "list_".concat(currentTaskListNumber.toString()),
-          title: newTaskListName,
+          title: "New List",
         },
       ]);
       setCurrentTaskListNumber(currentTaskListNumber + 1);
-    }
   }
 
   function handleTaskButtonClick(taskId: string) {

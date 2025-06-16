@@ -30,7 +30,7 @@ export default function TaskList({
         <h2 className="font-bold text-md my-1.5 flex flex-col gap-0.5 w-full">
           <input type="text" value={title} className="w-full text-black placeholder-grey outline-0 transition-all duration-150" onChange={(event) => {
             onTitleUpdate(id, event);
-          }} />
+          }} autoFocus />
           <div className="block w-0 group-hover:w-full group-focus-within:w-full transition-all duration-150 h-[1px] bg-grey" />
         </h2>
         <button onClick={() => {
