@@ -43,13 +43,12 @@ export default function AddTaskForm({
             className="w-full text-black placeholder-grey outline-0"
             autoFocus
           />
-          <div className="block max-w-0 group-hover:max-w-full group-focus-within:max-w-full transition-all duration-400 h-[1px] bg-grey" />
+          <div className="block max-w-0 group-hover:max-w-full group-focus-within:max-w-full transition-all duration-150 h-[1px] bg-grey" />
         </div>
       </section>
       <label htmlFor="taskListMenu" className="hidden">
         Task List to Select
       </label>
-      <br />
       <select name="taskListMenu" id="taskListMenu">
         {taskLists.map((taskList) => (
           <option key={taskList.id} value={taskList.id}>

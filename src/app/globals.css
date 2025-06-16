@@ -3,6 +3,7 @@
 :root {
   --background: #f3f5f7;
   --foreground: #090b0d;
+  caret-color: var(--foreground);
 }
 
 @theme inline {
