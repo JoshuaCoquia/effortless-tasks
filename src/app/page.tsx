@@ -71,8 +71,11 @@ export default function Home() {
     }))
   }
 
-  function handleTaskSubmit(taskId: string, e: React.FormEvent<HTMLInputElement>) {
-
+  function handleTaskSubmit(taskId: string, e: React.KeyboardEvent<HTMLInputElement>) {
+    const task = allTasks.find(task => task.id === taskId);
+    if (task === undefined) return;
+    const list = allTaskLists.find(list => list.id === task.parentTaskListId);
+    if (list) createNewTask("", list.id);
   }
 
   function handleTaskTextUpdate(taskId: string, e: React.ChangeEvent<HTMLInputElement>) {

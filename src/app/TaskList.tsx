@@ -12,6 +12,7 @@ type TaskListProps = {
   onTaskDelete: (id: string) => void;
   onTitleUpdate: (id: string, e: React.ChangeEvent<HTMLInputElement>) => void;
   onListDelete: (id: string) => void;
+  onTaskSubmit: (id:string, e: React.KeyboardEvent<HTMLInputElement>) => void;
 };
 
 export default function TaskList({
@@ -23,6 +24,7 @@ export default function TaskList({
   onTaskDelete,
   onTitleUpdate,
   onListDelete,
+  onTaskSubmit,
 }: TaskListProps) {
   return (
     <div className="m-4">
@@ -54,7 +56,12 @@ export default function TaskList({
                 onChange={(event) => {
                   onTaskTextUpdate(task.id, event);
                 }}
+                onKeyDown={(event) => {
+                  console.log('key')
+                  if (event.key === "Enter") onTaskSubmit(task.id, event);
+                }}
                 className={`peer outline-0 w-full ${task.completed ? "text-grey group-focus-within:text-black group-hover:text-black line-through" : "text-black"}`}
+                autoFocus
               />
               <div className="block w-0 peer-hover:w-full peer-focus:w-full transition-all duration-150 h-[1px] bg-grey" />
             </div>
