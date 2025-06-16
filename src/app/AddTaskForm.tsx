@@ -27,7 +27,7 @@ export default function AddTaskForm({
           type="submit"
           className="rounded-md m-2"
         >
-          <Image src={addCircle} width={24} height={24} alt="Add Task" />
+          <Image src={addCircle} width={24} height={24} alt="Add Task" className="pointer-events-none" />
         </button>
         <div className="w-full group pr-2">
           <label htmlFor="newTaskTitle" className="hidden">
@@ -49,7 +49,7 @@ export default function AddTaskForm({
       <label htmlFor="taskListMenu" className="hidden">
         List to Select
       </label>
-      <select name="taskListMenu" id="taskListMenu" className="bg-transparent p-2 border-0 border-b-2 border-grey-light hover:border-grey focus:border-grey active:border-grey outline-0">
+      <select name="taskListMenu" id="taskListMenu" className="bg-transparent p-2 border-0 border-b-2 border-grey-light hover:border-grey focus:border-grey active:border-grey outline-0 text-black">
         {taskLists.map((taskList) => (
           <option key={taskList.id} value={taskList.id} className="">
             {taskList.title}

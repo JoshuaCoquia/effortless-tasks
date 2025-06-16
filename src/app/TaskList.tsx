@@ -20,11 +20,11 @@ export default function TaskList({
       <h2 className="font-bold text-md my-1.5">{title}</h2>
       <ul>
         {tasks.map((task) => (
-          <li key={task.id} className="hover:bg-grey-light-background focus-within:bg-grey-light-background flex items-center border-0 rounded-lg gap-2 p-2 transition-all duration-400 group">
+          <li key={task.id} className="hover:bg-grey-light-background focus:bg-grey-light-background flex items-center border-0 rounded-lg gap-2 p-2 transition-all duration-400 group">
             <button onClick={() => {
               onTaskButtonClick(task.id);
             }} className="w-8 h-8 border-2 rounded-lg border-grey-dark flex-none outline-0">
-              {task.completed && <Image src={CheckIcon} width={24} height={24} alt="Check Mark" className="mx-auto my-auto" />}
+              {task.completed && <Image src={CheckIcon} width={24} height={24} alt="Check Mark" className="mx-auto my-auto pointer-events-none" />}
             </button>
             <div className="w-full flex-auto">
               <input
