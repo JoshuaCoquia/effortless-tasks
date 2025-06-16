@@ -15,7 +15,7 @@ export default function Home() {
       title: "Default",
     },
   ]);
-  const [allTasks, setAllTasks] = useState<TaskData[] | undefined>([
+  const [allTasks, setAllTasks] = useState<TaskData[]>([
     {
       id: "task_0",
       title: "Example Task",
@@ -86,7 +86,7 @@ export default function Home() {
   }
 
   function handleTaskDelete(taskId: string) {
-    setAllTasks(allTasks?.filter(task => task.id !== taskId));
+    setAllTasks(allTasks.filter(task => task.id !== taskId));
   }
 
   return (
