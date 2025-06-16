@@ -2,7 +2,6 @@ import type { TaskData } from "./types";
 import Image from "next/image";
 import CheckIcon from "@/images/check_16dp_090B0D_FILL0_wght400_GRAD0_opsz20.svg";
 import DeleteIcon from "@/images/delete_16dp_090B0D_FILL0_wght400_GRAD0_opsz20.svg"
-import { useEffect, useRef } from "react";
 
 type TaskListProps = {
   id: string;
