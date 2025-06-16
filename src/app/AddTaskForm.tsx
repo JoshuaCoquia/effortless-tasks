@@ -21,7 +21,7 @@ export default function AddTaskForm({
   onSubmit,
 }: AddTaskFormProps) {
   return (
-    <form id="addTaskForm" className="m-4 flex flex-col gap-2" onSubmit={onSubmit}>
+    <form id="addTaskForm" className="m-4 flex flex-col gap-2" onSubmit={onSubmit} autoFocus>
       <section className="bg-grey-light-background flex p-1 items-center border-sm rounded-lg">
         <button
           type="submit"

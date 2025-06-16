@@ -2,9 +2,11 @@ import type { TaskData } from "./types";
 import Image from "next/image";
 import CheckIcon from "@/images/check_16dp_090B0D_FILL0_wght400_GRAD0_opsz20.svg";
 import DeleteIcon from "@/images/delete_16dp_090B0D_FILL0_wght400_GRAD0_opsz20.svg"
+import { useEffect, useRef } from "react";
 
 type TaskListProps = {
   id: string;
+  isAutoFocusAllowed: boolean;
   isListDeletionAllowed: boolean;
   title: string;
   tasks: TaskData[];
@@ -18,6 +20,7 @@ type TaskListProps = {
 
 export default function TaskList({
   id,
+  isAutoFocusAllowed,
   isListDeletionAllowed,
   title,
   tasks,
@@ -28,13 +31,14 @@ export default function TaskList({
   onListDelete,
   onTaskSubmit,
 }: TaskListProps) {
+
   return (
     <div className="m-4">
       <section className="w-full group flex gap-2">
         <h2 className="font-bold text-md my-1.5 flex flex-col gap-0.5 w-full">
           <input type="text" value={title} className="w-full text-black placeholder-grey outline-0 transition-all duration-150" onChange={(event) => {
             onTitleUpdate(id, event);
-          }} autoFocus />
+          }} autoFocus={isAutoFocusAllowed}/>
           <div className="block w-0 group-hover:w-full group-focus-within:w-full transition-all duration-150 h-[1px] bg-grey" />
         </h2>
         {
@@ -65,7 +69,7 @@ export default function TaskList({
                   if (event.key === "Enter") onTaskSubmit(task.id, event);
                 }}
                 className={`peer outline-0 w-full ${task.completed ? "text-grey group-focus-within:text-black group-hover:text-black line-through" : "text-black"}`}
-                autoFocus
+                autoFocus={isAutoFocusAllowed}
               />
               <div className="block w-0 peer-hover:w-full peer-focus:w-full transition-all duration-150 h-[1px] bg-grey" />
             </div>

@@ -7,19 +7,18 @@ import TaskListView from "./TaskList";
 
 export default function Home() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [currentTaskNumber, setCurrentTaskNumber] = useState(1);
-  const [currentTaskListNumber, setCurrentTaskListNumber] = useState(1);
-  const [allTaskLists, setAllTaskLists] = useState<TaskList[]>([{ id: crypto.randomUUID(), title: "Example List" }]);
+  const [allTaskLists, setAllTaskLists] = useState<TaskList[]>([]);
   const [allTasks, setAllTasks] = useState<TaskData[]>([]);
   const [isListDeletionAllowed, setIsListDeletionAllowed] = useState<boolean>(false);
+  const [isAutoFocusAllowed, setIsAutoFocusAllowed] = useState<boolean>(false);
 
   function createNewTask(title: string, taskListId: string) {
+    if (isAutoFocusAllowed === false) setIsAutoFocusAllowed(true);
     const newTask: TaskData = {
       id: crypto.randomUUID(),
       title: title,
       parentTaskListId: taskListId,
     };
-    setCurrentTaskNumber(currentTaskNumber + 1);
     setAllTasks([...allTasks, newTask]);
     setNewTaskTitle("");
   }
@@ -37,6 +36,7 @@ export default function Home() {
 
   function handleNewTaskList(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
+    if (isAutoFocusAllowed === false) setIsAutoFocusAllowed(true);
     setAllTaskLists([
       ...allTaskLists,
       {
@@ -44,7 +44,6 @@ export default function Home() {
         title: "New List",
       },
     ]);
-    setCurrentTaskListNumber(currentTaskListNumber + 1);
     if (allTaskLists.length >= 1) { setIsListDeletionAllowed(true); } else { setIsListDeletionAllowed(false); }
   }
 
@@ -104,6 +103,7 @@ export default function Home() {
     const savedLists = JSON.parse(localStorage.getItem("allTaskLists")!);
     if (savedLists != null && savedLists.length > 0) {
       setAllTaskLists(savedLists);
+      if (savedLists.length > 1) setIsListDeletionAllowed(true);
     } else {
       setTimeout(() => setAllTaskLists([{ id: crypto.randomUUID(), title: "Example List" }]), 0)
     }
@@ -138,6 +138,7 @@ export default function Home() {
           <li key={taskList.id}>
             <TaskListView
               id={taskList.id}
+              isAutoFocusAllowed={isAutoFocusAllowed}
               isListDeletionAllowed={isListDeletionAllowed}
               title={taskList.title}
               tasks={allTasks.filter((task) => task.parentTaskListId === taskList.id)}
