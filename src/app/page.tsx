@@ -23,6 +23,17 @@ export default function Home() {
     },
   ]);
 
+  function createNewTask(title: string, taskListId: string) {
+      const newTask: TaskData = {
+        id: "task_".concat(currentTaskNumber.toString()),
+        title: title,
+        parentTaskListId: taskListId,
+      };
+      setCurrentTaskNumber(currentTaskNumber + 1);
+      setAllTasks([...allTasks, newTask]);
+      setNewTaskTitle("");
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -31,16 +42,7 @@ export default function Home() {
     const taskList = allTaskLists.find(
       (taskList) => taskList.id === taskListID
     );
-    if (taskList) {
-      const newTask: TaskData = {
-        id: "task_".concat(currentTaskNumber.toString()),
-        title: taskTitle,
-        parentTaskListId: taskListID,
-      };
-      setCurrentTaskNumber(currentTaskNumber + 1);
-      setAllTasks([...allTasks, newTask]);
-      setNewTaskTitle("");
-    }
+    if (taskList) createNewTask(taskTitle, taskList.id);
   }
 
   function handleNewTaskList(e: React.MouseEvent<HTMLButtonElement>) {
@@ -67,6 +69,10 @@ export default function Home() {
         return task;
       }
     }))
+  }
+
+  function handleTaskSubmit(taskId: string, e: React.FormEvent<HTMLInputElement>) {
+
   }
 
   function handleTaskTextUpdate(taskId: string, e: React.ChangeEvent<HTMLInputElement>) {
@@ -98,6 +104,7 @@ export default function Home() {
   function handleListDelete(listId: string) {
     setAllTaskLists(allTaskLists.filter(list => list.id !== listId));
   }
+  
 
   return (
     <main>
@@ -125,6 +132,7 @@ export default function Home() {
               onTaskDelete={handleTaskDelete}
               onTitleUpdate={handleTitleUpdate}
               onListDelete={handleListDelete}
+              onTaskSubmit={handleTaskSubmit}
             />
           </li>
         ))}
