@@ -1,7 +1,7 @@
 "use client";
 
 import type { TaskData, TaskList } from "./types";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import AddTaskForm from "./AddTaskForm";
 import TaskListView from "./TaskList";
 
@@ -22,16 +22,17 @@ export default function Home() {
       parentTaskListId: "list_0",
     },
   ]);
+  const [isListDeletionAllowed, setIsListDeletionAllowed] = useState<boolean>(false);
 
   function createNewTask(title: string, taskListId: string) {
-      const newTask: TaskData = {
-        id: "task_".concat(currentTaskNumber.toString()),
-        title: title,
-        parentTaskListId: taskListId,
-      };
-      setCurrentTaskNumber(currentTaskNumber + 1);
-      setAllTasks([...allTasks, newTask]);
-      setNewTaskTitle("");
+    const newTask: TaskData = {
+      id: "task_".concat(currentTaskNumber.toString()),
+      title: title,
+      parentTaskListId: taskListId,
+    };
+    setCurrentTaskNumber(currentTaskNumber + 1);
+    setAllTasks([...allTasks, newTask]);
+    setNewTaskTitle("");
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -47,14 +48,15 @@ export default function Home() {
 
   function handleNewTaskList(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
-      setAllTaskLists([
-        ...allTaskLists,
-        {
-          id: "list_".concat(currentTaskListNumber.toString()),
-          title: "New List",
-        },
-      ]);
-      setCurrentTaskListNumber(currentTaskListNumber + 1);
+    setAllTaskLists([
+      ...allTaskLists,
+      {
+        id: "list_".concat(currentTaskListNumber.toString()),
+        title: "New List",
+      },
+    ]);
+    setCurrentTaskListNumber(currentTaskListNumber + 1);
+    allTaskLists.length >= 1 ? setIsListDeletionAllowed(true) : setIsListDeletionAllowed(false);
   }
 
   function handleTaskButtonClick(taskId: string) {
@@ -106,8 +108,9 @@ export default function Home() {
 
   function handleListDelete(listId: string) {
     setAllTaskLists(allTaskLists.filter(list => list.id !== listId));
+    allTaskLists.length > 2 ? setIsListDeletionAllowed(true) : setIsListDeletionAllowed(false);
   }
-  
+
 
   return (
     <main>
@@ -128,6 +131,7 @@ export default function Home() {
           <li key={taskList.id}>
             <TaskListView
               id={taskList.id}
+              isListDeletionAllowed={isListDeletionAllowed}
               title={taskList.title}
               tasks={allTasks.filter((task) => task.parentTaskListId === taskList.id)}
               onTaskButtonClick={handleTaskButtonClick}

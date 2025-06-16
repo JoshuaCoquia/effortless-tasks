@@ -5,6 +5,7 @@ import DeleteIcon from "@/images/delete_16dp_090B0D_FILL0_wght400_GRAD0_opsz20.s
 
 type TaskListProps = {
   id: string;
+  isListDeletionAllowed: boolean;
   title: string;
   tasks: TaskData[];
   onTaskButtonClick: (id: string) => void;
@@ -12,11 +13,12 @@ type TaskListProps = {
   onTaskDelete: (id: string) => void;
   onTitleUpdate: (id: string, e: React.ChangeEvent<HTMLInputElement>) => void;
   onListDelete: (id: string) => void;
-  onTaskSubmit: (id:string, e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onTaskSubmit: (id: string, e: React.KeyboardEvent<HTMLInputElement>) => void;
 };
 
 export default function TaskList({
   id,
+  isListDeletionAllowed,
   title,
   tasks,
   onTaskButtonClick,
@@ -35,11 +37,13 @@ export default function TaskList({
           }} autoFocus />
           <div className="block w-0 group-hover:w-full group-focus-within:w-full transition-all duration-150 h-[1px] bg-grey" />
         </h2>
-        <button onClick={() => {
-          onListDelete(id);
-        }} className="hidden group-focus-within:block group-hover:block">
-          <Image src={DeleteIcon} width={24} height={24} alt="Delete Task Icon" />
-        </button>
+        {
+          isListDeletionAllowed && <button onClick={() => {
+            onListDelete(id);
+          }} className="hidden group-focus-within:block group-hover:block">
+            <Image src={DeleteIcon} width={24} height={24} alt="Delete Task Icon" />
+          </button>
+        }
       </section>
       <ul>
         {tasks.map((task) => (
