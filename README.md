@@ -4,6 +4,15 @@ A minimal to-do list app.
 
 [View Demo][app-url]
 
+## Built With
+
+[![Next][Next.js]][Next-url]
+[![React][React.js]][React-url]
+[![Tailwind][Tailwindcss]][Tailwind-url]
+[![Typescript][Typescript]][Typescript-url]
+[![Vercel][Vercel]][Vercel-url]
+[![Yarn][Yarnpkg]][Yarn-url]
+
 ## Features
 
 - Create, read, update, and delete tasks under multiple user-created task lists.
@@ -14,15 +23,6 @@ A minimal to-do list app.
 ## Screenshots
 ![Screenshot](./screenshots/EffortlessTasksScreenshot.png)
 ![Screen Recording](./screenshots/EffortlessTasksDemo.gif)
-
-## Built With
-
-[![Next][Next.js]][Next-url]
-[![React][React.js]][React-url]
-[![Tailwind][Tailwindcss]][Tailwind-url]
-[![Typescript][Typescript]][Typescript-url]
-[![Vercel][Vercel]][Vercel-url]
-[![Yarn][Yarnpkg]][Yarn-url]
 
 ## Prerequisites
 
