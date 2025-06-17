@@ -11,6 +11,11 @@ const sourceSans = Source_Sans_3({
 export const metadata: Metadata = {
   title: "Effortless Tasks",
   description: "A minimal to-do list app.",
+  openGraph: {
+    title: "Effortless Tasks",
+    type: "website",
+    url: "https://effortless-tasks.vercel.app"
+  }
 };
 
 export default function RootLayout({
@@ -20,8 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-    
-    <body className={`${sourceSans.variable} antialiased`}>{children}</body>
+      <body className={`${sourceSans.variable} antialiased`}>{children}</body>
     </html>
   );
 }
