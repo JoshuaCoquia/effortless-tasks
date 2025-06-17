@@ -37,13 +37,13 @@ export default function TaskList({
         <h2 className="font-bold text-md my-1.5 flex flex-col gap-0.5 w-full">
           <input type="text" value={title} className="w-full text-black placeholder-grey outline-0 transition-all duration-150" onChange={(event) => {
             onTitleUpdate(id, event);
-          }} autoFocus={isAutoFocusAllowed}/>
+          }} autoFocus={isAutoFocusAllowed} id={id} aria-label={`List: ${title}`} />
           <div className="block w-0 group-hover:w-full group-focus-within:w-full transition-all duration-150 h-[1px] bg-grey" />
         </h2>
         {
           isListDeletionAllowed && <button onClick={() => {
             onListDelete(id);
-          }} className="hidden group-focus-within:block group-hover:block">
+          }} className="hidden group-focus-within:block group-hover:block" aria-label={`Button to delete list: ${title}`}>
             <Image src={DeleteIcon} width={24} height={24} alt="Delete Task Icon" />
           </button>
         }
@@ -53,7 +53,7 @@ export default function TaskList({
           <li key={task.id} className="hover:bg-grey-light-background focus-within:bg-grey-light-background flex items-center border-0 rounded-lg gap-2 p-2 transition-all duration-400 group">
             <button onClick={() => {
               onTaskButtonClick(task.id);
-            }} className="w-8 h-8 border-2 rounded-lg border-grey-dark flex-none outline-0">
+            }} className="w-8 h-8 border-2 rounded-lg border-grey-dark flex-none outline-0" aria-label={`Button to complete task: ${task.title}`}>
               {task.completed && <Image src={CheckIcon} width={24} height={24} alt="Complete Task Icon" className="mx-auto my-auto pointer-events-none" />}
             </button>
             <div className="w-full flex-auto">
@@ -69,12 +69,14 @@ export default function TaskList({
                 }}
                 className={`peer outline-0 w-full ${task.completed ? "text-grey group-focus-within:text-black group-hover:text-black line-through" : "text-black"}`}
                 autoFocus={isAutoFocusAllowed}
+                id={task.id}
+                aria-label={`Task: ${task.title}`}
               />
               <div className="block w-0 peer-hover:w-full peer-focus:w-full transition-all duration-150 h-[1px] bg-grey" />
             </div>
             <button onClick={() => {
               onTaskDelete(task.id);
-            }} className="hidden group-focus-within:block group-hover:block">
+            }} className="hidden group-focus-within:block group-hover:block" aria-label={`Button to delete task: ${task.title}`}>
               <Image src={DeleteIcon} width={24} height={24} alt="Delete Task Icon" />
             </button>
           </li>

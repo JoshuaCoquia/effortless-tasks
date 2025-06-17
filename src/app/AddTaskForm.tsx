@@ -30,9 +30,6 @@ export default function AddTaskForm({
           <Image src={addCircle} width={24} height={24} alt="Add Task" className="pointer-events-none" />
         </button>
         <div className="w-full group pr-2">
-          <label htmlFor="newTaskTitle" className="hidden">
-            New Task Title
-          </label>
           <input
             type="text"
             name="newTaskTitle"
@@ -42,14 +39,12 @@ export default function AddTaskForm({
             onChange={onTaskTitleChange}
             className="w-full text-black placeholder-grey outline-0 transition-all duration-150"
             autoFocus
+            aria-label="New task field"
           />
           <div className="block max-w-0 group-hover:max-w-full group-focus-within:max-w-full transition-all duration-150 h-[1px] bg-grey" />
         </div>
       </section>
-      <label htmlFor="taskListMenu" className="hidden">
-        List to Select
-      </label>
-      <select name="taskListMenu" id="taskListMenu" className="bg-transparent p-2 border-0 border-b-2 border-grey-light hover:border-grey focus:border-grey active:border-grey outline-0 text-black">
+      <select name="taskListMenu" id="taskListMenu" className="bg-transparent p-2 border-0 border-b-2 border-grey-light hover:border-grey focus:border-grey active:border-grey outline-0 text-black" aria-label="Select list to add new tasks to">
         {taskLists.map((taskList) => (
           <option key={taskList.id} value={taskList.id} className="">
             {taskList.title}
@@ -60,6 +55,7 @@ export default function AddTaskForm({
         type="button"
         onClick={onCreateNewTaskList}
         className="w-fit hover:bg-grey-light-background focus:bg-grey-light-background p-2 border-0 rounded-lg transition-colors duration-150 outline-0"
+        aria-label="Create new list"
       >
         Create New List
       </button>

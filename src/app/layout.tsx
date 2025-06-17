@@ -10,7 +10,7 @@ const sourceSans = Source_Sans_3({
 
 export const metadata: Metadata = {
   title: "Effortless Tasks",
-  description: "A simple to-do list app",
+  description: "A minimal to-do list app.",
 };
 
 export default function RootLayout({
@@ -20,6 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+    
     <body className={`${sourceSans.variable} antialiased`}>{children}</body>
     </html>
   );
