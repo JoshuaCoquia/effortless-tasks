@@ -2,8 +2,8 @@
 
 import type { TaskData, TaskList } from "./types";
 import { useState, useEffect } from "react";
-import AddTaskForm from "./AddTaskForm";
-import TaskListView from "./TaskList";
+import AddTaskForm from "@/components/AddTaskForm";
+import TaskListView from "@/components/TaskList";
 
 export default function Home() {
   const [newTaskTitle, setNewTaskTitle] = useState("");

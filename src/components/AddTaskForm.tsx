@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import addCircle from "@/images/add_circle_16dp_090B0D_FILL0_wght400_GRAD0_opsz20.svg";
-import type { TaskList } from "./types";
+import type { TaskList } from "@/app/types";
 
 type AddTaskFormProps = {
   taskTitle: string;
