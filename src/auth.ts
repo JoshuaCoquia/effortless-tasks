@@ -1,4 +1,5 @@
 import NextAuth from "next-auth"
+import Resend from "next-auth/providers/resend"
 import { SupabaseAdapter } from "@auth/supabase-adapter"
 import jwt from "jsonwebtoken"
  
@@ -6,7 +7,7 @@ import jwt from "jsonwebtoken"
 // https://authjs.dev/reference/core/types#authconfig
 export const { handlers, auth, signIn, signOut } = NextAuth({
   // https://authjs.dev/getting-started/authentication/oauth
-  providers: [],
+  providers: [Resend],
   adapter: SupabaseAdapter({
     url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
