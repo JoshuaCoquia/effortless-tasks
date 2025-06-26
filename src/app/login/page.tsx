@@ -12,7 +12,10 @@ export const metadata: Metadata = {
 };
 
 export default function LoginPage() {
-    return (
-        <SignIn />
-    );
+  return (
+    <main className="flex flex-col items-center justify-center min-h-screen p-4">
+      <h1 className="text-2xl font-bold mb-4">Login with Email</h1>
+      <SignIn />
+    </main>
+  );
 }
