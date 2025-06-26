@@ -4,6 +4,7 @@ import type { TaskData, TaskList } from "./types";
 import { useState, useEffect } from "react";
 import AddTaskForm from "@/components/AddTaskForm";
 import TaskListView from "@/components/TaskList";
+import Header from "@/components/Header";
 
 export default function Home() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -122,6 +123,7 @@ export default function Home() {
   return (
     <main>
       <h1 className="hidden">Effortless Tasks</h1>
+      <Header />
       {/* Add task form */}
       <AddTaskForm
         taskTitle={newTaskTitle}
