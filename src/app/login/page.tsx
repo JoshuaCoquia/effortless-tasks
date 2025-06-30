@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SignIn } from "@/components/SignIn";
+import { EmailSignIn } from "@/components/EmailSignIn";
 
 export const metadata: Metadata = {
   title: "Login | Effortless Tasks",
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-2xl font-bold mb-4">Login with Email</h1>
-      <SignIn />
+      <h1 className="text-2xl font-bold mb-4">Log in with Email</h1>
+      <EmailSignIn />
     </main>
   );
 }

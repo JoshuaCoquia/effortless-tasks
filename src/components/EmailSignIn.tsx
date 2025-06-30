@@ -2,7 +2,7 @@
 import { signIn } from "next-auth/react"
 import { useState } from "react";
 
-export function SignIn() {
+export function EmailSignIn() {
   const [email, setEmail] = useState(""); 
   const resendAction = () => {
     signIn("resend", {email});
@@ -23,7 +23,7 @@ export function SignIn() {
           />
         </label>
         <br />
-        <input type="submit" value="Signin with Resend" className="w-full border-2 rounded-lg p-1 hover:bg-grey-light-background focus:bg-grey-light-background transition-colors duration-150 outline-0" />
+        <input type="submit" value="Log in with Email" className="w-full border-2 rounded-lg p-1 hover:bg-grey-light-background focus:bg-grey-light-background transition-colors duration-150 outline-0" />
       </form>
   );
 }
