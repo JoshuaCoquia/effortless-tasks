@@ -17,9 +17,11 @@
   --color-red-dark: #750A0A;
   --font-sans: var(--font-source-sans);
   --font-mono: monospace;
+  /* typographic scale: 1.200 */
   --text-sm: 0.833rem;
   --text-base: 16px;
   --text-md: 1.2rem;
+  --text-lg: 1.44rem;
 }
 
 /* @media (prefers-color-scheme: dark) {

@@ -6,7 +6,10 @@ import AccountDropdown from "./AccountDropdown";
 export default async function Header() {
   const session = await auth();
   return (
-    <header className="flex justify-end items-end p-4">
+    <header className="flex p-4 align-center justify-between flex-col md:flex-row">
+      <div className="h-12 flex justify-center align-center">
+        <h1 className="text-lg font-bold my-auto hidden md:block">Effortless Tasks</h1>
+      </div>
       {session ? (
         <AccountDropdown session={session} />
       ) : (
