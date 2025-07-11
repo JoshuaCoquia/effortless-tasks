@@ -18,6 +18,9 @@ export default function Home() {
       id: crypto.randomUUID(),
       title: title,
       parentTaskListId: taskListId,
+      completed: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     setAllTasks([...allTasks, newTask]);
     setNewTaskTitle("");
@@ -42,6 +45,8 @@ export default function Home() {
       {
         id: crypto.randomUUID(),
         title: "New List",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     ]);
     if (allTaskLists.length >= 1) { setIsListDeletionAllowed(true); } else { setIsListDeletionAllowed(false); }
@@ -105,7 +110,12 @@ export default function Home() {
       setAllTaskLists(savedLists);
       if (savedLists.length > 1) setIsListDeletionAllowed(true);
     } else {
-      setTimeout(() => setAllTaskLists([{ id: crypto.randomUUID(), title: "Example List" }]), 0)
+      setTimeout(() => setAllTaskLists([{
+        id: crypto.randomUUID(),
+        title: "Example List",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }]), 0)
     }
     const savedTasks = localStorage.getItem("allTasks");
     if (savedTasks != null && JSON.parse(JSON.stringify(savedTasks)).length > 0) { setAllTasks(JSON.parse(savedTasks)); } else { setAllTaskLists([]) }
