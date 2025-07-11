@@ -11,8 +11,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     from: process.env.RESEND_FROM_EMAIL!,
   })],
   adapter: SupabaseAdapter({
-    url: process.env.SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    secret: process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!,
   }),
   callbacks: {
     async session({ session, user }) {
