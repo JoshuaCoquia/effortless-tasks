@@ -49,7 +49,7 @@ export default function TaskList({
         }
       </section>
       <ul>
-        {tasks.map((task) => (
+        {tasks.filter(t => t.deleted != true).map((task) => (
           <li key={task.id} className="hover:bg-grey-light-background focus-within:bg-grey-light-background flex items-center border-0 rounded-lg gap-2 p-2 transition-all duration-400 group">
             <button onClick={() => {
               onTaskButtonClick(task.id);

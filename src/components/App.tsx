@@ -89,7 +89,16 @@ export default function Home() {
   }
 
   function handleTaskDelete(taskId: string) {
-    setAllTasks(allTasks.filter(task => task.id !== taskId));
+    supabase.from("tasks").update({ deleted: true }).eq("id", taskId).then(() => {});
+    setAllTasks(allTasks.map(task => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          deleted: true,
+          updatedAt: new Date().toISOString(),
+        }
+      } else { return task; }
+    }));
   }
 
   function handleTitleUpdate(listId: string, e: React.ChangeEvent<HTMLInputElement>) {
@@ -105,7 +114,17 @@ export default function Home() {
   }
 
   function handleListDelete(listId: string) {
-    setAllTaskLists(allTaskLists.filter(list => list.id !== listId));
+    supabase.from("lists").update({ deleted: true }).eq("id", listId).then(() => {});
+    supabase.from("tasks").update({ deleted: true }).eq("parent_list_id", listId).then(() => {});
+    setAllTaskLists(allTaskLists.map(list => {
+      if (list.id === listId) {
+        return {
+          ...list,
+          deleted: true,
+          updatedAt: new Date().toISOString(),
+        }
+      } else { return list; }
+    }));
     if (allTaskLists.length > 2) { setIsListDeletionAllowed(true); } else { setIsListDeletionAllowed(false); }
   }
 
@@ -150,7 +169,7 @@ export default function Home() {
           await supabase.from("lists").upsert(
             lists!.filter(list => {
               const serverList = taskListsData!.data!.find((l: TaskList) => l.id === list.id);
-              if (serverList === undefined) return true;
+              if (serverList === undefined && serverList.deleted != true) return true;
               return (new Date(serverList.updated_at) < new Date(list.updatedAt));
             }).map((list: TaskList) => ({
               id: list.id,
@@ -158,12 +177,13 @@ export default function Home() {
               created_at: list.createdAt,
               updated_at: list.updatedAt,
               user_id: user.id,
+              deleted: list.deleted || false,
             })));
 
           await supabase.from("tasks").upsert(
             tasks!.filter((task: TaskData) => {
               const serverTask = tasksData!.data!.find((t: TaskData) => t.id === task.id);
-              if (serverTask === undefined) return true;
+              if (serverTask === undefined && serverTask != true) return true;
               return (new Date(serverTask.updated_at) < new Date(task.updatedAt));
             }).map((task: TaskData) => ({
               id: task.id,
@@ -173,17 +193,19 @@ export default function Home() {
               updated_at: task.updatedAt,
               parent_list_id: task.parentTaskListId,
               user_id: user.id,
+              deleted: task.deleted || false,
             })));
 
           const updatedLists = lists!.map(list => {
             const serverList = taskListsData!.data!.find((l: TaskList) => l.id === list.id);
-            if (serverList === undefined) return list;
+            if (serverList === undefined && serverList.deleted != true) return list;
             if (new Date(serverList.updated_at) < new Date(list.updatedAt)) return list;
             return {
               id: serverList.id,
               title: serverList.title,
               createdAt: serverList.created_at,
               updatedAt: serverList.updated_at,
+              deleted: serverList.deleted || false,
             };
           });
           updatedLists.push(...taskListsData!.data!.filter((l) => !lists?.map((list) => list.id).includes(l.id)));
@@ -200,6 +222,7 @@ export default function Home() {
               createdAt: serverTask.created_at,
               updatedAt: serverTask.updated_at,
               parentTaskListId: serverTask.parent_list_id,
+              deleted: serverTask.deleted || false,
             };
           })
           updatedTasks.push(...tasksData!.data!.filter((t) => !tasks?.map((task) => task.id).includes(t.id)));
@@ -262,7 +285,7 @@ export default function Home() {
         onCreateNewTaskList={handleNewTaskList}
       />
       <ul>
-        {allTaskLists.map((taskList) => (
+        {allTaskLists.filter(t => t.deleted != true).map((taskList) => (
           <li key={taskList.id}>
             <TaskListView
               id={taskList.id}
