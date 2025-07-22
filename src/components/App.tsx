@@ -141,7 +141,6 @@ export default function Home() {
   useEffect(() => {
     const savedLists = JSON.parse(localStorage.getItem("allTaskLists")!);
     if (savedLists == null || savedLists.length <= 0) {
-      console.log("No saved task lists found, creating a default one.");
       savedLists.push(createNewTaskList());
     }
     const savedTasks = JSON.parse(localStorage.getItem("allTasks")!);
@@ -248,7 +247,6 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.setItem("allTasks", JSON.stringify(allTasks));
-    console.log("Tasks updated:", allTasks);
   }, [allTasks]);
 
   return (
@@ -280,9 +278,6 @@ export default function Home() {
               onListSubmit={handleListSubmit}
             />
           </li>
-        ))}
-        {allTasks.map((task) => (
-          <li key={task.id}>{task.title}</li>
         ))}
       </ul>
     </>
