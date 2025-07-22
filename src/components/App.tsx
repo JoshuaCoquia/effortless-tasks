@@ -130,91 +130,82 @@ export default function Home() {
   }, []);
 
   async function syncUserData(lists: TaskList[] | null, tasks: TaskData[] | null) {
-    console.log("Syncing with Supabase...");
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      console.log("User found:", user);
       const userData = await supabase.from("userInfo").select("*").eq("id", user.id).single();
       if (!userData.data) {
-        console.log("No user data found, creating new user entry.");
         await supabase.from("userInfo").insert({
           id: user.id,
           email: user.email,
           has_synced_tasks: false
         });
-      } else {
-        console.log("User data found:", userData.data);
-        if (!userData.data.has_synced_tasks) {
-          console.log("User has not synced tasks yet, inserting data...");
-        } else {
-          console.log("User has already synced tasks, fetching data...");
-          const taskListsPromise = supabase.from("lists").select("*").eq("user_id", user.id);
-          const tasksPromise = supabase.from("tasks").select("*").eq("user_id", user.id);
-          Promise.all([taskListsPromise, tasksPromise]).then(async ([taskListsData, tasksData]) => {
-            let errorArray = [];
-            if (taskListsData.error) errorArray.push(taskListsData.error);
-            if (tasksData.error) errorArray.push(tasksData.error);
-            if (errorArray.length > 0) throw new Error(JSON.stringify(errorArray));
-            await supabase.from("lists").upsert(
-              lists!.filter(list => {
-                const serverList = taskListsData!.data!.find((l: TaskList) => l.id === list.id);
-                if (serverList === undefined) return true;
-                return (new Date(serverList.updated_at) < new Date(list.updatedAt));
-              }).map((list: TaskList) => ({
-                id: list.id,
-                title: list.title,
-                created_at: list.createdAt,
-                updated_at: list.updatedAt,
-                user_id: user.id,
-              })));
-
-            await supabase.from("tasks").upsert(
-              tasks!.filter((task: TaskData) => {
-                const serverTask = tasksData!.data!.find((t: TaskData) => t.id === task.id);
-                if (serverTask === undefined) return true;
-                return (new Date(serverTask.updated_at) < new Date(task.updatedAt));
-              }).map((task: TaskData) => ({
-                id: task.id,
-                title: task.title,
-                completed: task.completed,
-                created_at: task.createdAt,
-                updated_at: task.updatedAt,
-                parent_list_id: task.parentTaskListId,
-                user_id: user.id,
-              })));
-
-            const updatedLists = lists!.map(list => {
+      } else if (userData.data.has_synced_tasks) {
+        const taskListsPromise = supabase.from("lists").select("*").eq("user_id", user.id);
+        const tasksPromise = supabase.from("tasks").select("*").eq("user_id", user.id);
+        Promise.all([taskListsPromise, tasksPromise]).then(async ([taskListsData, tasksData]) => {
+          let errorArray = [];
+          if (taskListsData.error) errorArray.push(taskListsData.error);
+          if (tasksData.error) errorArray.push(tasksData.error);
+          if (errorArray.length > 0) throw new Error(JSON.stringify(errorArray));
+          await supabase.from("lists").upsert(
+            lists!.filter(list => {
               const serverList = taskListsData!.data!.find((l: TaskList) => l.id === list.id);
-              if (serverList === undefined) return list;
-              if (new Date(serverList.updated_at) < new Date(list.updatedAt)) return list;
-              return {
-                id: serverList.id,
-                title: serverList.title,
-                createdAt: serverList.created_at,
-                updatedAt: serverList.updated_at,
-              };
-            })
-            setAllTaskLists(updatedLists);
+              if (serverList === undefined) return true;
+              return (new Date(serverList.updated_at) < new Date(list.updatedAt));
+            }).map((list: TaskList) => ({
+              id: list.id,
+              title: list.title,
+              created_at: list.createdAt,
+              updated_at: list.updatedAt,
+              user_id: user.id,
+            })));
 
-            const updatedTasks = tasks!.map(task => {
+          await supabase.from("tasks").upsert(
+            tasks!.filter((task: TaskData) => {
               const serverTask = tasksData!.data!.find((t: TaskData) => t.id === task.id);
-              if (serverTask === undefined) return task;
-              if (new Date(serverTask.updated_at) < new Date(task.updatedAt)) return task;
-              return {
-                id: serverTask.id,
-                title: serverTask.title,
-                completed: serverTask.completed,
-                createdAt: serverTask.created_at,
-                updatedAt: serverTask.updated_at,
-                parentTaskListId: serverTask.parent_list_id,
-              };
-            })
-            setAllTasks(updatedTasks);
-          }).catch((error) => {
-            console.error("Error fetching user data:", error);
+              if (serverTask === undefined) return true;
+              return (new Date(serverTask.updated_at) < new Date(task.updatedAt));
+            }).map((task: TaskData) => ({
+              id: task.id,
+              title: task.title,
+              completed: task.completed,
+              created_at: task.createdAt,
+              updated_at: task.updatedAt,
+              parent_list_id: task.parentTaskListId,
+              user_id: user.id,
+            })));
+
+          const updatedLists = lists!.map(list => {
+            const serverList = taskListsData!.data!.find((l: TaskList) => l.id === list.id);
+            if (serverList === undefined) return list;
+            if (new Date(serverList.updated_at) < new Date(list.updatedAt)) return list;
+            return {
+              id: serverList.id,
+              title: serverList.title,
+              createdAt: serverList.created_at,
+              updatedAt: serverList.updated_at,
+            };
           })
-          return;
-        }
+          setAllTaskLists(updatedLists);
+
+          const updatedTasks = tasks!.map(task => {
+            const serverTask = tasksData!.data!.find((t: TaskData) => t.id === task.id);
+            if (serverTask === undefined) return task;
+            if (new Date(serverTask.updated_at) < new Date(task.updatedAt)) return task;
+            return {
+              id: serverTask.id,
+              title: serverTask.title,
+              completed: serverTask.completed,
+              createdAt: serverTask.created_at,
+              updatedAt: serverTask.updated_at,
+              parentTaskListId: serverTask.parent_list_id,
+            };
+          })
+          setAllTasks(updatedTasks);
+        }).catch((error) => {
+          console.error("Error fetching user data:", error);
+        })
+        return;
       }
 
       if (lists) {
