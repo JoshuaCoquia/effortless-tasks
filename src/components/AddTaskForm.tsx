@@ -39,6 +39,7 @@ export default function AddTaskForm({
             onChange={onTaskTitleChange}
             className="w-full text-black placeholder-grey outline-0 transition-all duration-150"
             autoFocus
+            autoComplete="off"
             aria-label="New task field"
           />
           <div className="block max-w-0 group-hover:max-w-full group-focus-within:max-w-full transition-all duration-150 h-[1px] bg-grey" />
@@ -54,7 +55,7 @@ export default function AddTaskForm({
       <button
         type="button"
         onClick={onCreateNewTaskList}
-        className="w-fit hover:bg-grey-light-background focus:bg-grey-light-background p-2 border-0 rounded-lg transition-colors duration-150 outline-0 cursor-pointer"
+        className="w-fit hover:bg-grey-light-background focus:bg-grey-light-background p-2 border-2 border-grey-light rounded-lg transition-colors duration-150 outline-0 cursor-pointer"
         aria-label="Create new list"
       >
         Create New List
