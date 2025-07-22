@@ -185,7 +185,8 @@ export default function Home() {
               createdAt: serverList.created_at,
               updatedAt: serverList.updated_at,
             };
-          })
+          });
+          updatedLists.push(...taskListsData!.data!.filter((l) => !lists?.map((list) => list.id).includes(l.id)));
           setAllTaskLists(updatedLists);
 
           const updatedTasks = tasks!.map(task => {
@@ -201,6 +202,7 @@ export default function Home() {
               parentTaskListId: serverTask.parent_list_id,
             };
           })
+          updatedTasks.push(...tasksData!.data!.filter((t) => !tasks?.map((task) => task.id).includes(t.id)));
           setAllTasks(updatedTasks);
         }).catch((error) => {
           console.error("Error fetching user data:", error);
