@@ -172,7 +172,7 @@ export default function Home() {
         const taskListsPromise = supabase.from("lists").select("*").eq("user_id", user.id);
         const tasksPromise = supabase.from("tasks").select("*").eq("user_id", user.id);
         Promise.all([taskListsPromise, tasksPromise]).then(async ([taskListsData, tasksData]) => {
-          let errorArray = [];
+          const errorArray = [];
           if (taskListsData.error) errorArray.push(taskListsData.error);
           if (tasksData.error) errorArray.push(tasksData.error);
           if (errorArray.length > 0) throw new Error(JSON.stringify(errorArray));

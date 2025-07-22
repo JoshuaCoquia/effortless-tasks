@@ -27,7 +27,7 @@ export default function LoginPage() {
           <br />
           <button formAction={login} className="w-full border-2 border-black p-2 outline-0 rounded-lg cursor-pointer hover:bg-grey-light-background focus:bg-grey-light-background transition-colors duration-150">Log in</button>
         </form>
-        <p>Don't have an account yet? <a href="/signup" className="underline">Sign up now!</a></p>
+        <p>Need an account? <a href="/signup" className="underline">Sign up now!</a></p>
       </section>
 
     </>
