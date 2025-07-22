@@ -25,7 +25,7 @@ export default function AddTaskForm({
       <section className="bg-grey-light-background flex p-1 items-center border-sm rounded-lg">
         <button
           type="submit"
-          className="rounded-md m-2"
+          className="rounded-md m-2 cursor-pointer"
         >
           <Image src={addCircle} width={24} height={24} alt="Add Task" className="pointer-events-none" />
         </button>
@@ -54,7 +54,7 @@ export default function AddTaskForm({
       <button
         type="button"
         onClick={onCreateNewTaskList}
-        className="w-fit hover:bg-grey-light-background focus:bg-grey-light-background p-2 border-0 rounded-lg transition-colors duration-150 outline-0"
+        className="w-fit hover:bg-grey-light-background focus:bg-grey-light-background p-2 border-0 rounded-lg transition-colors duration-150 outline-0 cursor-pointer"
         aria-label="Create new list"
       >
         Create New List
