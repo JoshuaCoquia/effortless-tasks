@@ -19,7 +19,6 @@ export default function SignUpPage() {
         <form className="my-4 mx-4 items-center flex flex-col gap-4 w-full max-w-prose">
           <label className="font-bold w-full">Email<span className="text-red-dark">*</span>
             <input id="email" name="email" type="email" required autoFocus className="w-full bg-grey-light-background border-0 rounded-lg my-0.5 px-2 py-1.5 font-normal" />
-            <p className="font-normal text-sm md:text-base">You will be sent an email to confirm your email address.</p>
           </label>
           <label className="font-bold w-full">Password<span className="text-red-dark">*</span>
             <input id="password" name="password" type="password" required className="w-full bg-grey-light-background border-0 rounded-lg my-0.5 px-2 py-1.5 font-normal" />
