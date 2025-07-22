@@ -139,8 +139,9 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const savedLists = JSON.parse(localStorage.getItem("allTaskLists")!);
-    if (savedLists == null || savedLists.length <= 0) {
+    const savedLists = [];
+    savedLists.push(...JSON.parse(localStorage.getItem("allTaskLists") || "[]"));
+    if (savedLists.length <= 0) {
       savedLists.push(createNewTaskList());
     }
     const savedTasks = JSON.parse(localStorage.getItem("allTasks")!);
@@ -165,7 +166,7 @@ export default function Home() {
           updated_at: list.updatedAt,
           user_id: user.id,
           deleted: list.deleted || false,
-        })));
+        })), { onConflict: "id" });
         await supabase.from("tasks").upsert(tasks!.map((task: TaskData) => ({
           id: task.id,
           title: task.title,
@@ -175,7 +176,7 @@ export default function Home() {
           parent_list_id: task.parentTaskListId,
           user_id: user.id,
           deleted: task.deleted || false,
-        })));
+        })), { onConflict: "id" });
         const taskListsPromise = supabase.from("lists").select("*").eq("user_id", user.id);
         const tasksPromise = supabase.from("tasks").select("*").eq("user_id", user.id);
         Promise.all([taskListsPromise, tasksPromise]).then(async ([taskListsData, tasksData]) => {
