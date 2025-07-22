@@ -2,6 +2,7 @@ import type { TaskData } from "@/app/types";
 import Image from "next/image";
 import CheckIcon from "@/images/check_16dp_090B0D_FILL0_wght400_GRAD0_opsz20.svg";
 import DeleteIcon from "@/images/delete_16dp_090B0D_FILL0_wght400_GRAD0_opsz20.svg"
+import { useEffect, useRef } from "react";
 
 type TaskListProps = {
   id: string;
@@ -15,6 +16,7 @@ type TaskListProps = {
   onTitleUpdate: (id: string, e: React.ChangeEvent<HTMLInputElement>) => void;
   onListDelete: (id: string) => void;
   onTaskSubmit: (id: string, e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onListSubmit: (id: string, e: React.KeyboardEvent<HTMLInputElement>) => void;
 };
 
 export default function TaskList({
@@ -29,15 +31,23 @@ export default function TaskList({
   onTitleUpdate,
   onListDelete,
   onTaskSubmit,
+  onListSubmit,
 }: TaskListProps) {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.select();
+    }
+  }, []);
 
   return (
     <div className="m-4">
       <section className="w-full group flex gap-2">
         <h2 className="font-bold text-md my-1.5 flex flex-col gap-0.5 w-full">
-          <input type="text" value={title} className="w-full text-black placeholder-grey outline-0 transition-all duration-150" onChange={(event) => {
-            onTitleUpdate(id, event);
-          }} autoFocus={isAutoFocusAllowed} id={id} aria-label={`List: ${title}`} />
+          <input type="text" value={title} className="w-full text-black placeholder-grey outline-0 transition-all duration-150"
+            onChange={(event) => { onTitleUpdate(id, event); }}
+            onKeyDown={(event) => { if (event.key === "Enter") onListSubmit(id, event); }}
+            autoFocus={isAutoFocusAllowed} id={id} aria-label={`List: ${title}`} ref={ref} />
           <div className="block w-0 group-hover:w-full group-focus-within:w-full transition-all duration-150 h-[1px] bg-grey" />
         </h2>
         {
@@ -64,7 +74,6 @@ export default function TaskList({
                   onTaskTextUpdate(task.id, event);
                 }}
                 onKeyDown={(event) => {
-                  console.log('key')
                   if (event.key === "Enter") onTaskSubmit(task.id, event);
                 }}
                 className={`peer outline-0 w-full ${task.completed ? "text-grey group-focus-within:text-black group-hover:text-black line-through" : "text-black"}`}

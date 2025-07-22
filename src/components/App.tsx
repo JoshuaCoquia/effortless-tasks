@@ -39,8 +39,7 @@ export default function Home() {
     if (taskList) createNewTask(taskTitle, taskList.id);
   }
 
-  function handleNewTaskList(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault();
+  function createNewTaskList() {
     if (isAutoFocusAllowed === false) setIsAutoFocusAllowed(true);
     setAllTaskLists([
       ...allTaskLists,
@@ -51,7 +50,12 @@ export default function Home() {
         updatedAt: new Date().toISOString(),
       },
     ]);
-    if (allTaskLists.length >= 1) { setIsListDeletionAllowed(true); } else { setIsListDeletionAllowed(false); }
+    if (allTaskLists.filter(t => t.deleted != true).length >= 1) { setIsListDeletionAllowed(true); } else { setIsListDeletionAllowed(false); }
+  }
+
+  function handleNewTaskList(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    createNewTaskList();
   }
 
   function handleTaskButtonClick(taskId: string) {
@@ -74,6 +78,12 @@ export default function Home() {
     if (task === undefined) return;
     const list = allTaskLists.find(list => list.id === task.parentTaskListId);
     if (list) createNewTask("", list.id);
+  }
+
+  function handleListSubmit(listId: string) {
+    const list = allTaskLists.find(list => list.id === listId);
+    if (list === undefined) return;
+    createNewTaskList();
   }
 
   function handleTaskTextUpdate(taskId: string, e: React.ChangeEvent<HTMLInputElement>) {
@@ -125,14 +135,14 @@ export default function Home() {
         }
       } else { return list; }
     }));
-    if (allTaskLists.length > 2) { setIsListDeletionAllowed(true); } else { setIsListDeletionAllowed(false); }
+    if (allTaskLists.filter(t => t.deleted != true).length > 2) { setIsListDeletionAllowed(true); } else { setIsListDeletionAllowed(false); }
   }
 
   useEffect(() => {
     const savedLists = JSON.parse(localStorage.getItem("allTaskLists")!);
     if (savedLists != null && savedLists.length > 0) {
       setAllTaskLists(savedLists);
-      if (savedLists.length > 1) setIsListDeletionAllowed(true);
+      if (savedLists.filter((t: TaskList) => t.deleted != true).length > 1) setIsListDeletionAllowed(true);
     } else {
       setTimeout(() => setAllTaskLists([{
         id: crypto.randomUUID(),
@@ -169,7 +179,7 @@ export default function Home() {
           await supabase.from("lists").upsert(
             lists!.filter(list => {
               const serverList = taskListsData!.data!.find((l: TaskList) => l.id === list.id);
-              if (serverList === undefined && serverList.deleted != true) return true;
+              if (serverList === undefined) return true;
               return (new Date(serverList.updated_at) < new Date(list.updatedAt));
             }).map((list: TaskList) => ({
               id: list.id,
@@ -183,7 +193,7 @@ export default function Home() {
           await supabase.from("tasks").upsert(
             tasks!.filter((task: TaskData) => {
               const serverTask = tasksData!.data!.find((t: TaskData) => t.id === task.id);
-              if (serverTask === undefined && serverTask != true) return true;
+              if (serverTask === undefined) return true;
               return (new Date(serverTask.updated_at) < new Date(task.updatedAt));
             }).map((task: TaskData) => ({
               id: task.id,
@@ -198,7 +208,7 @@ export default function Home() {
 
           const updatedLists = lists!.map(list => {
             const serverList = taskListsData!.data!.find((l: TaskList) => l.id === list.id);
-            if (serverList === undefined && serverList.deleted != true) return list;
+            if (serverList === undefined) return list;
             if (new Date(serverList.updated_at) < new Date(list.updatedAt)) return list;
             return {
               id: serverList.id,
@@ -299,6 +309,7 @@ export default function Home() {
               onTitleUpdate={handleTitleUpdate}
               onListDelete={handleListDelete}
               onTaskSubmit={handleTaskSubmit}
+              onListSubmit={handleListSubmit}
             />
           </li>
         ))}

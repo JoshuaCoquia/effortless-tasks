@@ -46,7 +46,7 @@ export default function AddTaskForm({
         </div>
       </section>
       <select name="taskListMenu" id="taskListMenu" className="bg-transparent p-2 border-0 border-b-2 border-grey-light hover:border-grey focus:border-grey active:border-grey outline-0 text-black" aria-label="Select list to add new tasks to">
-        {taskLists.map((taskList) => (
+        {taskLists.filter(t => t.deleted != true).map((taskList) => (
           <option key={taskList.id} value={taskList.id} className="">
             {taskList.title}
           </option>
