@@ -35,7 +35,7 @@ export default function TaskList({
 }: TaskListProps) {
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (ref.current) {
+    if (ref.current && isAutoFocusAllowed) {
       ref.current.select();
     }
   }, []);
