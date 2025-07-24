@@ -16,15 +16,16 @@ export default function Home() {
   const lastPolledRef = useRef<Date>(new Date(0));
   const tasksRef = useRef<TaskData[]>([]);
   const listsRef = useRef<TaskList[]>([]);
-  const [userHasSyncedTasks, setUserHasSyncedTasks] = useState<boolean>(false);
 
   // https://www.joshwcomeau.com/snippets/javascript/debounce/
-  const debounce = (callback: Function, wait: number) => {
-    let timeoutId: number; // Explicitly declare as number
-    return (...args: any[]) => {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const debounce = (callback: (...args: any) => void, wait: number) => {
+    let timeoutId: number; 
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    return (...args: any) => {
       window.clearTimeout(timeoutId);
       timeoutId = window.setTimeout(() => {
-        callback.apply(null, args);
+        callback(...args);
       }, wait);
     };
   }
@@ -91,9 +92,7 @@ export default function Home() {
   }
 
   const syncTaskCompletion = useMemo(() => debounce((taskId: string) => {
-    console.log("Syncing task completion for:", taskId);
     supabase.from("tasks").update({ completed: allTasks.find(task => task.id === taskId)?.completed }).eq("id", taskId).then(() => {
-      console.log("Task completion synced for:", taskId);
     });
   }, 350), [])
 
@@ -164,7 +163,7 @@ export default function Home() {
     }));
   }
 
-  async function handleTaskBlur(taskId: string, e: React.FocusEvent<HTMLInputElement>) {
+  async function handleTaskBlur(taskId: string) {
     const updatedTask = allTasks.find(task => task.id === taskId);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user || !updatedTask) return;
@@ -174,7 +173,7 @@ export default function Home() {
     }, { onConflict: "id" });
   }
 
-  async function handleTitleBlur(listId: string, e: React.FocusEvent<HTMLInputElement>) {
+  async function handleTitleBlur(listId: string) {
     const updatedList = allTaskLists.find(list => list.id === listId);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user || !updatedList) return;
@@ -189,10 +188,25 @@ export default function Home() {
     setAllTasks(tasks);
     setAllTaskLists(lists);
     syncUserData();
+
     setInterval(() => {
-      console.log();
       syncUserData();
     }, 1000 * 60 * 1.5);
+
+    const onReconnect = () => {
+      syncUserData();
+    }
+
+    const visibilityChangeHandler = () => {
+      if (document.visibilityState === "visible") syncUserData(); 
+    }
+
+    document.addEventListener("visibilitychange", visibilityChangeHandler);
+    window.addEventListener("online", onReconnect);
+    return () => {
+      document.removeEventListener("visibilitychange", visibilityChangeHandler);
+      window.removeEventListener("online", onReconnect);
+    }
   }, []);
 
   function fetchFromLocalStorage() {
@@ -221,7 +235,6 @@ export default function Home() {
         const taskListsPromise = supabase.from("lists").select().eq("user_id", user.id).gt("updated_at", lastPolledRef.current.toISOString());
         const tasksPromise = supabase.from("tasks").select().eq("user_id", user.id).gt("updated_at", lastPolledRef.current.toISOString());
         Promise.all([taskListsPromise, tasksPromise]).then(async ([taskListsData, tasksData]) => {
-          console.log("Syncing user data...");
           const errorArray = [];
           if (taskListsData.error) errorArray.push(taskListsData.error);
           if (tasksData.error) errorArray.push(tasksData.error);
@@ -245,7 +258,6 @@ export default function Home() {
           setAllTasks(Array.from(mergedTasks.values()));
 
           lastPolledRef.current = pollTime;
-          console.log("User data synced successfully.", lists, tasks);
 
         }).catch((error) => {
           const { lists, tasks } = fetchFromLocalStorage();
