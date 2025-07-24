@@ -211,22 +211,8 @@ export default function Home() {
           if (taskListsData.error) errorArray.push(taskListsData.error);
           if (tasksData.error) errorArray.push(tasksData.error);
           if (errorArray.length > 0) throw new Error(JSON.stringify(errorArray));
-          setAllTaskLists(taskListsData.data?.map((list) => ({
-            id: list.id,
-            title: list.title,
-            created_at: list.created_at,
-            updated_at: list.updated_at,
-            deleted: list.deleted || false,
-          })) || []);
-          setAllTasks(tasksData.data?.map((task) => ({
-            id: task.id,
-            title: task.title,
-            completed: task.completed,
-            created_at: task.created_at,
-            updated_at: task.updated_at,
-            parent_list_id: task.parent_list_id,
-            deleted: task.deleted || false,
-          })) || []);
+          setAllTaskLists(taskListsData.data?.map((list) => ({ ...list })) || []);
+          setAllTasks(tasksData.data?.map((task) => ({ ...task })) || []);
         }).catch((error) => {
           console.error("Error fetching user data:", error);
         })
