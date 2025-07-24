@@ -3,15 +3,15 @@ export type TaskData = {
   title: string;
   completed?: boolean;
   deleted?: boolean;
-  parentTaskListId: string;
-  createdAt: string;
-  updatedAt: string;
+  parent_list_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export type TaskList = {
   id: string;
   title: string;
   deleted?: boolean;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }

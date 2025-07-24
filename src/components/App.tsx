@@ -1,14 +1,13 @@
 "use client";
 
 import type { TaskData, TaskList } from "@/app/types";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import AddTaskForm from "@/components/AddTaskForm";
 import TaskListView from "@/components/TaskList";
 import { createClient } from "@/utils/supabase/client";
 
 export default function Home() {
   const supabase = createClient();
-  const [user, setUser] = useState(null);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [allTaskLists, setAllTaskLists] = useState<TaskList[]>([]);
   const [allTasks, setAllTasks] = useState<TaskData[]>([]);
@@ -20,10 +19,10 @@ export default function Home() {
     const newTask: TaskData = {
       id: crypto.randomUUID(),
       title: title,
-      parentTaskListId: taskListId,
+      parent_list_id: taskListId,
       completed: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
     setAllTasks([...allTasks, newTask]);
     setNewTaskTitle("");
@@ -44,8 +43,8 @@ export default function Home() {
     const newList = {
       id: crypto.randomUUID(),
       title: "New List",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
     if (isAutoFocusAllowed === false) setIsAutoFocusAllowed(true);
     setAllTaskLists([
@@ -67,7 +66,7 @@ export default function Home() {
         return {
           ...task,
           completed: updatedTaskCompletion,
-          updatedAt: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         }
       } else {
         return task;
@@ -78,7 +77,7 @@ export default function Home() {
   function handleTaskSubmit(taskId: string) {
     const task = allTasks.find(task => task.id === taskId);
     if (task === undefined) return;
-    const list = allTaskLists.find(list => list.id === task.parentTaskListId);
+    const list = allTaskLists.find(list => list.id === task.parent_list_id);
     if (list) createNewTask("", list.id);
   }
 
@@ -94,7 +93,7 @@ export default function Home() {
         return {
           ...task,
           title: e.target.value,
-          updatedAt: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         }
       } else { return task; }
     }))
@@ -108,7 +107,7 @@ export default function Home() {
         return {
           ...task,
           deleted: true,
-          updatedAt: currentDate,
+          updated_at: currentDate,
         }
       } else { return task; }
     }));
@@ -121,7 +120,7 @@ export default function Home() {
         return {
           ...list,
           title: e.target.value,
-          updatedAt: currentDate,
+          updated_at: currentDate,
         }
       } else { return list; }
     }));
@@ -136,7 +135,7 @@ export default function Home() {
         return {
           ...list,
           deleted: true,
-          updatedAt: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         }
       } else { return list; }
     }));
@@ -147,13 +146,7 @@ export default function Home() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user || !updatedTask) return;
     await supabase.from("tasks").upsert({
-      id: taskId,
-      title: updatedTask.title,
-      completed: updatedTask.completed,
-      created_at: updatedTask.createdAt,
-      updated_at: updatedTask.updatedAt,
-      parent_list_id: updatedTask.parentTaskListId,
-      deleted: updatedTask.deleted || false,
+      ...updatedTask,
       user_id: user.id,
     }, { onConflict: "id" });
   }
@@ -163,11 +156,7 @@ export default function Home() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user || !updatedList) return;
     await supabase.from("lists").upsert({
-      id: listId,
-      title: updatedList.title,
-      created_at: updatedList.createdAt,
-      updated_at: updatedList.updatedAt,
-      deleted: updatedList.deleted || false,
+      ...updatedList,
       user_id: user.id,
     }, { onConflict: "id" });
   }
@@ -207,23 +196,13 @@ export default function Home() {
       } else if (userData.data.has_synced_tasks) {
         const { data: listsFromDb } = await supabase.from("lists").select("*").eq("user_id", user.id);
         const { data: tasksFromDb } = await supabase.from("tasks").select("*").eq("user_id", user.id);
-        await supabase.from("lists").upsert(lists!.filter((list) => ((new Date(listsFromDb?.find((l) => l.id === list.id).updated_at) < new Date(list.updatedAt)))).map((list: TaskList) => ({
-          id: list.id,
-          title: list.title,
-          created_at: list.createdAt,
-          updated_at: list.updatedAt,
+        await supabase.from("lists").upsert(lists!.filter((list) => ((new Date(listsFromDb?.find((l) => l.id === list.id).updated_at) < new Date(list.updated_at)))).map((list: TaskList) => ({
+          ...list,
           user_id: user.id,
-          deleted: list.deleted || false,
         })), { onConflict: "id" });
-        await supabase.from("tasks").upsert(tasks!.filter((task) => ((new Date(tasksFromDb?.find((t) => t.id === task.id).updated_at) < new Date(task.updatedAt)))).map((task: TaskData) => ({
-          id: task.id,
-          title: task.title,
-          completed: task.completed,
-          created_at: task.createdAt,
-          updated_at: task.updatedAt,
-          parent_list_id: task.parentTaskListId,
+        await supabase.from("tasks").upsert(tasks!.filter((task) => ((new Date(tasksFromDb?.find((t) => t.id === task.id).updated_at) < new Date(task.updated_at)))).map((task: TaskData) => ({
+          ...task,
           user_id: user.id,
-          deleted: task.deleted || false,
         })), { onConflict: "id" });
         const taskListsPromise = supabase.from("lists").select("*").eq("user_id", user.id);
         const tasksPromise = supabase.from("tasks").select("*").eq("user_id", user.id);
@@ -235,17 +214,17 @@ export default function Home() {
           setAllTaskLists(taskListsData.data?.map((list) => ({
             id: list.id,
             title: list.title,
-            createdAt: list.created_at,
-            updatedAt: list.updated_at,
+            created_at: list.created_at,
+            updated_at: list.updated_at,
             deleted: list.deleted || false,
           })) || []);
           setAllTasks(tasksData.data?.map((task) => ({
             id: task.id,
             title: task.title,
             completed: task.completed,
-            createdAt: task.created_at,
-            updatedAt: task.updated_at,
-            parentTaskListId: task.parent_list_id,
+            created_at: task.created_at,
+            updated_at: task.updated_at,
+            parent_list_id: task.parent_list_id,
             deleted: task.deleted || false,
           })) || []);
         }).catch((error) => {
@@ -255,28 +234,16 @@ export default function Home() {
       }
 
       if (lists) {
-        await supabase.from("lists").insert(
-          lists.map((list: TaskList) => ({
-            id: list.id,
-            title: list.title,
-            created_at: list.createdAt,
-            updated_at: list.updatedAt,
-            user_id: user.id,
-          }))
-        );
+        await supabase.from("lists").insert({
+          ...lists,
+          user_id: user.id,
+        });
       }
       if (tasks) {
-        await supabase.from("tasks").insert(
-          tasks.map((task: TaskData) => ({
-            id: task.id,
-            title: task.title,
-            completed: task.completed,
-            created_at: task.createdAt,
-            updated_at: task.updatedAt,
-            parent_list_id: task.parentTaskListId,
-            user_id: user.id,
-          }))
-        );
+        await supabase.from("tasks").insert({
+          ...tasks,
+          user_id: user.id,
+        });
       }
       await supabase.from("userInfo").upsert({
         id: user.id,
@@ -317,7 +284,7 @@ export default function Home() {
               isAutoFocusAllowed={isAutoFocusAllowed}
               isListDeletionAllowed={isListDeletionAllowed}
               title={taskList.title}
-              tasks={allTasks.filter((task) => task.parentTaskListId === taskList.id)}
+              tasks={allTasks.filter((task) => task.parent_list_id === taskList.id)}
               onTaskButtonClick={handleTaskButtonClick}
               onTaskTextUpdate={handleTaskTextUpdate}
               onTaskDelete={handleTaskDelete}
