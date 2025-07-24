@@ -8,6 +8,7 @@ import { createClient } from "@/utils/supabase/client";
 
 export default function Home() {
   const supabase = createClient();
+  const [user, setUser] = useState(null);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [allTaskLists, setAllTaskLists] = useState<TaskList[]>([]);
   const [allTasks, setAllTasks] = useState<TaskData[]>([]);
@@ -100,33 +101,36 @@ export default function Home() {
   }
 
   function handleTaskDelete(taskId: string) {
-    supabase.from("tasks").update({ deleted: true }).eq("id", taskId).then(() => { });
+    const currentDate = new Date().toISOString();
+    supabase.from("tasks").update({ deleted: true, updated_at: currentDate }).eq("id", taskId).then(() => { });
     setAllTasks(allTasks.map(task => {
       if (task.id === taskId) {
         return {
           ...task,
           deleted: true,
-          updatedAt: new Date().toISOString(),
+          updatedAt: currentDate,
         }
       } else { return task; }
     }));
   }
 
   function handleTitleUpdate(listId: string, e: React.ChangeEvent<HTMLInputElement>) {
+    const currentDate = new Date().toISOString();
     setAllTaskLists(allTaskLists.map(list => {
       if (list.id === listId) {
         return {
           ...list,
           title: e.target.value,
-          updatedAt: new Date().toISOString(),
+          updatedAt: currentDate,
         }
       } else { return list; }
     }));
   }
 
   function handleListDelete(listId: string) {
-    supabase.from("lists").update({ deleted: true }).eq("id", listId).then(() => { });
-    supabase.from("tasks").update({ deleted: true }).eq("parent_list_id", listId).then(() => { });
+    const currentDate = new Date().toISOString();
+    supabase.from("lists").update({ deleted: true, updated_at: currentDate }).eq("id", listId).then(() => { });
+    supabase.from("tasks").update({ deleted: true, updated_at: currentDate }).eq("parent_list_id", listId).then(() => { });
     setAllTaskLists(allTaskLists.map(list => {
       if (list.id === listId) {
         return {
@@ -136,6 +140,36 @@ export default function Home() {
         }
       } else { return list; }
     }));
+  }
+
+  async function handleTaskBlur(taskId: string, e: React.FocusEvent<HTMLInputElement>) {
+    const updatedTask = allTasks.find(task => task.id === taskId);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || !updatedTask) return;
+    await supabase.from("tasks").upsert({
+      id: taskId,
+      title: updatedTask.title,
+      completed: updatedTask.completed,
+      created_at: updatedTask.createdAt,
+      updated_at: updatedTask.updatedAt,
+      parent_list_id: updatedTask.parentTaskListId,
+      deleted: updatedTask.deleted || false,
+      user_id: user.id,
+    }, { onConflict: "id" });
+  }
+
+  async function handleTitleBlur(listId: string, e: React.FocusEvent<HTMLInputElement>) {
+    const updatedList = allTaskLists.find(list => list.id === listId);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || !updatedList) return;
+    await supabase.from("lists").upsert({
+      id: listId,
+      title: updatedList.title,
+      created_at: updatedList.createdAt,
+      updated_at: updatedList.updatedAt,
+      deleted: updatedList.deleted || false,
+      user_id: user.id,
+    }, { onConflict: "id" });
   }
 
   useEffect(() => {
@@ -153,7 +187,7 @@ export default function Home() {
     }
     setAllTaskLists(savedLists);
     setAllTasks(savedTasks);
-    return { lists: savedLists, tasks: savedTasks};
+    return { lists: savedLists, tasks: savedTasks };
   };
 
   async function syncUserData(lists: TaskList[] | null, tasks: TaskData[] | null) {
@@ -287,6 +321,8 @@ export default function Home() {
               onListDelete={handleListDelete}
               onTaskSubmit={handleTaskSubmit}
               onListSubmit={handleListSubmit}
+              onTaskBlur={handleTaskBlur}
+              onTitleBlur={handleTitleBlur}
             />
           </li>
         ))}

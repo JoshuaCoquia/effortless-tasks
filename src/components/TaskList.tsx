@@ -17,6 +17,8 @@ type TaskListProps = {
   onListDelete: (id: string) => void;
   onTaskSubmit: (id: string, e: React.KeyboardEvent<HTMLInputElement>) => void;
   onListSubmit: (id: string, e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onTaskBlur: (id: string, e: React.FocusEvent<HTMLInputElement>) => void;
+  onTitleBlur: (id: string, e: React.FocusEvent<HTMLInputElement>) => void;
 };
 
 export default function TaskList({
@@ -32,6 +34,8 @@ export default function TaskList({
   onListDelete,
   onTaskSubmit,
   onListSubmit,
+  onTaskBlur,
+  onTitleBlur,
 }: TaskListProps) {
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -47,6 +51,8 @@ export default function TaskList({
           <input type="text" value={title} className="w-full text-black placeholder-grey outline-0 transition-all duration-150"
             onChange={(event) => { onTitleUpdate(id, event); }}
             onKeyDown={(event) => { if (event.key === "Enter") onListSubmit(id, event); }}
+            onBlur={(event) => { onTitleBlur(id, event); }}
+            placeholder="List Title"
             autoFocus={isAutoFocusAllowed} id={id} aria-label={`List: ${title}`} ref={ref} />
           <div className="block w-0 group-hover:w-full group-focus-within:w-full transition-all duration-150 h-[1px] bg-grey" />
         </h2>
@@ -76,6 +82,7 @@ export default function TaskList({
                 onKeyDown={(event) => {
                   if (event.key === "Enter") onTaskSubmit(task.id, event);
                 }}
+                onBlur={(event) => { onTaskBlur(task.id, event); }}
                 className={`peer outline-0 w-full ${task.completed ? "text-grey group-focus-within:text-black group-hover:text-black line-through" : "text-black"}`}
                 autoFocus={isAutoFocusAllowed}
                 id={task.id}
