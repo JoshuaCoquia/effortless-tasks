@@ -1,7 +1,7 @@
 "use client";
 
 import type { TaskData, TaskList } from "@/app/types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import AddTaskForm from "@/components/AddTaskForm";
 import TaskListView from "@/components/TaskList";
 import { createClient } from "@/utils/supabase/client";
@@ -13,6 +13,17 @@ export default function Home() {
   const [allTasks, setAllTasks] = useState<TaskData[]>([]);
   const [isListDeletionAllowed, setIsListDeletionAllowed] = useState<boolean>(false);
   const [isAutoFocusAllowed, setIsAutoFocusAllowed] = useState<boolean>(false);
+
+  // https://www.joshwcomeau.com/snippets/javascript/debounce/
+  const debounce = (callback: Function, wait: number) => {
+    let timeoutId: number; // Explicitly declare as number
+    return (...args: any[]) => {
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        callback.apply(null, args);
+      }, wait);
+    };
+  }
 
   function createNewTask(title: string, taskListId: string) {
     if (isAutoFocusAllowed === false) setIsAutoFocusAllowed(true);
@@ -62,7 +73,7 @@ export default function Home() {
   function handleTaskButtonClick(taskId: string) {
     setAllTasks(allTasks.map(task => {
       if (task.id === taskId) {
-        const updatedTaskCompletion = task.completed ? false : true;
+        const updatedTaskCompletion = !task.completed;
         return {
           ...task,
           completed: updatedTaskCompletion,
@@ -72,7 +83,15 @@ export default function Home() {
         return task;
       }
     }))
+    syncTaskCompletion(taskId);
   }
+
+  const syncTaskCompletion = useMemo(() => debounce((taskId: string) => {
+    console.log("Syncing task completion for:", taskId);
+    supabase.from("tasks").update({ completed: allTasks.find(task => task.id === taskId)?.completed }).eq("id", taskId).then(() => {
+      console.log("Task completion synced for:", taskId);
+    });
+  }, 500), [])
 
   function handleTaskSubmit(taskId: string) {
     const task = allTasks.find(task => task.id === taskId);
