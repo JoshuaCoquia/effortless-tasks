@@ -139,13 +139,15 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const savedLists = [];
+    const savedLists: TaskList[] = [];
     savedLists.push(...JSON.parse(localStorage.getItem("allTaskLists") || "[]"));
     if (savedLists.length <= 0) {
       savedLists.push(createNewTaskList());
     }
-    const savedTasks = JSON.parse(localStorage.getItem("allTasks")!);
-    syncUserData(savedLists, savedTasks!);
+    const savedTasks: TaskData[] = JSON.parse(localStorage.getItem("allTasks") || "[]");
+    setAllTasks(savedTasks);
+    setAllTaskLists(savedLists);
+    syncUserData(savedLists, savedTasks);
   }, []);
 
   async function syncUserData(lists: TaskList[] | null, tasks: TaskData[] | null) {
@@ -159,7 +161,9 @@ export default function Home() {
           has_synced_tasks: false
         });
       } else if (userData.data.has_synced_tasks) {
-        await supabase.from("lists").upsert(lists!.map((list: TaskList) => ({
+        const { data: listsFromDb } = await supabase.from("lists").select("*").eq("user_id", user.id);
+        const { data: tasksFromDb } = await supabase.from("tasks").select("*").eq("user_id", user.id);
+        await supabase.from("lists").upsert(lists!.filter((list) => ((new Date(listsFromDb?.find((l) => l.id === list.id).updated_at) < new Date(list.updatedAt)))).map((list: TaskList) => ({
           id: list.id,
           title: list.title,
           created_at: list.createdAt,
@@ -167,7 +171,7 @@ export default function Home() {
           user_id: user.id,
           deleted: list.deleted || false,
         })), { onConflict: "id" });
-        await supabase.from("tasks").upsert(tasks!.map((task: TaskData) => ({
+        await supabase.from("tasks").upsert(tasks!.filter((task) => ((new Date(tasksFromDb?.find((t) => t.id === task.id).updated_at) < new Date(task.updatedAt)))).map((task: TaskData) => ({
           id: task.id,
           title: task.title,
           completed: task.completed,
