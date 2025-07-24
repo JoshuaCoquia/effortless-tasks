@@ -1,7 +1,7 @@
 "use client";
 
 import type { TaskData, TaskList } from "@/app/types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import AddTaskForm from "@/components/AddTaskForm";
 import TaskListView from "@/components/TaskList";
 import { createClient } from "@/utils/supabase/client";
@@ -139,16 +139,22 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const savedLists: TaskList[] = [];
-    savedLists.push(...JSON.parse(localStorage.getItem("allTaskLists") || "[]"));
+    const { lists, tasks } = fetchFromLocalStorage();
+    setAllTasks(tasks);
+    setAllTaskLists(lists);
+    syncUserData(lists, tasks);
+  }, []);
+
+  function fetchFromLocalStorage() {
+    const savedLists: TaskList[] = JSON.parse(localStorage.getItem("allTaskLists") || "[]");
+    const savedTasks: TaskData[] = JSON.parse(localStorage.getItem("allTasks") || "[]");
     if (savedLists.length <= 0) {
       savedLists.push(createNewTaskList());
     }
-    const savedTasks: TaskData[] = JSON.parse(localStorage.getItem("allTasks") || "[]");
-    setAllTasks(savedTasks);
     setAllTaskLists(savedLists);
-    syncUserData(savedLists, savedTasks);
-  }, []);
+    setAllTasks(savedTasks);
+    return { lists: savedLists, tasks: savedTasks};
+  };
 
   async function syncUserData(lists: TaskList[] | null, tasks: TaskData[] | null) {
     const { data: { user } } = await supabase.auth.getUser();
