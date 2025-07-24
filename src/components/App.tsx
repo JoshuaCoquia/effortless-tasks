@@ -177,6 +177,10 @@ export default function Home() {
     setAllTasks(tasks);
     setAllTaskLists(lists);
     syncUserData(lists, tasks);
+    setInterval(() => {
+      const { lists: newLists, tasks: newTasks } = fetchFromLocalStorage();
+      syncUserData(newLists, newTasks);
+    }, 1000 * 60);
   }, []);
 
   function fetchFromLocalStorage() {
