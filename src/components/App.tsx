@@ -1,7 +1,7 @@
 "use client";
 
 import type { TaskData, TaskList } from "@/app/types";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import AddTaskForm from "@/components/AddTaskForm";
 import TaskListView from "@/components/TaskList";
 import { createClient } from "@/utils/supabase/client";
@@ -13,6 +13,10 @@ export default function Home() {
   const [allTasks, setAllTasks] = useState<TaskData[]>([]);
   const [isListDeletionAllowed, setIsListDeletionAllowed] = useState<boolean>(false);
   const [isAutoFocusAllowed, setIsAutoFocusAllowed] = useState<boolean>(false);
+  const lastPolledRef = useRef<Date>(new Date(0));
+  const tasksRef = useRef<TaskData[]>([]);
+  const listsRef = useRef<TaskList[]>([]);
+  const [userHasSyncedTasks, setUserHasSyncedTasks] = useState<boolean>(false);
 
   // https://www.joshwcomeau.com/snippets/javascript/debounce/
   const debounce = (callback: Function, wait: number) => {
@@ -91,7 +95,7 @@ export default function Home() {
     supabase.from("tasks").update({ completed: allTasks.find(task => task.id === taskId)?.completed }).eq("id", taskId).then(() => {
       console.log("Task completion synced for:", taskId);
     });
-  }, 500), [])
+  }, 350), [])
 
   function handleTaskSubmit(taskId: string) {
     const task = allTasks.find(task => task.id === taskId);
@@ -184,11 +188,11 @@ export default function Home() {
     const { lists, tasks } = fetchFromLocalStorage();
     setAllTasks(tasks);
     setAllTaskLists(lists);
-    syncUserData(lists, tasks);
+    syncUserData();
     setInterval(() => {
-      const { lists: newLists, tasks: newTasks } = fetchFromLocalStorage();
-      syncUserData(newLists, newTasks);
-    }, 1000 * 60);
+      console.log();
+      syncUserData();
+    }, 1000 * 60 * 1.5);
   }, []);
 
   function fetchFromLocalStorage() {
@@ -202,7 +206,8 @@ export default function Home() {
     return { lists: savedLists, tasks: savedTasks };
   };
 
-  async function syncUserData(lists: TaskList[] | null, tasks: TaskData[] | null) {
+  async function syncUserData() {
+    const pollTime = new Date();
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       const userData = await supabase.from("userInfo").select("*").eq("id", user.id).single();
@@ -213,61 +218,61 @@ export default function Home() {
           has_synced_tasks: false
         });
       } else if (userData.data.has_synced_tasks) {
-        const { data: listsFromDb } = await supabase.from("lists").select("*").eq("user_id", user.id);
-        const { data: tasksFromDb } = await supabase.from("tasks").select("*").eq("user_id", user.id);
-        await supabase.from("lists").upsert(lists!.filter((list) => ((new Date(listsFromDb?.find((l) => l.id === list.id).updated_at) < new Date(list.updated_at)))).map((list: TaskList) => ({
-          ...list,
-          user_id: user.id,
-        })), { onConflict: "id" });
-        await supabase.from("tasks").upsert(tasks!.filter((task) => ((new Date(tasksFromDb?.find((t) => t.id === task.id).updated_at) < new Date(task.updated_at)))).map((task: TaskData) => ({
-          ...task,
-          user_id: user.id,
-        })), { onConflict: "id" });
-        const taskListsPromise = supabase.from("lists").select("*").eq("user_id", user.id);
-        const tasksPromise = supabase.from("tasks").select("*").eq("user_id", user.id);
+        const taskListsPromise = supabase.from("lists").select().eq("user_id", user.id).gt("updated_at", lastPolledRef.current.toISOString());
+        const tasksPromise = supabase.from("tasks").select().eq("user_id", user.id).gt("updated_at", lastPolledRef.current.toISOString());
         Promise.all([taskListsPromise, tasksPromise]).then(async ([taskListsData, tasksData]) => {
+          console.log("Syncing user data...");
           const errorArray = [];
           if (taskListsData.error) errorArray.push(taskListsData.error);
           if (tasksData.error) errorArray.push(tasksData.error);
           if (errorArray.length > 0) throw new Error(JSON.stringify(errorArray));
-          setAllTaskLists(taskListsData.data?.map((list) => ({ ...list })) || []);
-          setAllTasks(tasksData.data?.map((task) => ({ ...task })) || []);
+
+          const lists = listsRef.current;
+          const tasks = tasksRef.current;
+
+          const mergedLists = new Map<string, TaskList>();
+          lists?.forEach(list => { mergedLists.set(list.id, list); });
+          taskListsData.data?.forEach(l => {
+            if (!mergedLists.has(l.id) || (l.updated_at > mergedLists.get(l.id)!.updated_at)) mergedLists.set(l.id, l);
+          });
+          setAllTaskLists(Array.from(mergedLists.values()));
+
+          const mergedTasks = new Map<string, TaskData>();
+          tasks?.forEach(task => { mergedTasks.set(task.id, task); });
+          tasksData.data?.forEach(t => {
+            if (!mergedTasks.has(t.id) || (t.updated_at > mergedTasks.get(t.id)!.updated_at)) mergedTasks.set(t.id, t);
+          });
+          setAllTasks(Array.from(mergedTasks.values()));
+
+          lastPolledRef.current = pollTime;
+          console.log("User data synced successfully.", lists, tasks);
+
         }).catch((error) => {
+          const { lists, tasks } = fetchFromLocalStorage();
           console.error("Error fetching user data:", error);
+          setAllTaskLists(lists || []);
+          setAllTasks(tasks || []);
         })
         return;
       }
 
-      if (lists) {
-        await supabase.from("lists").insert({
-          ...lists,
-          user_id: user.id,
-        });
-      }
-      if (tasks) {
-        await supabase.from("tasks").insert({
-          ...tasks,
-          user_id: user.id,
-        });
-      }
       await supabase.from("userInfo").upsert({
         id: user.id,
         email: user.email,
         has_synced_tasks: true
       });
-    } else {
-      setAllTaskLists(lists || []);
-      setAllTasks(tasks || []);
     }
   }
 
   useEffect(() => {
     localStorage.setItem("allTaskLists", JSON.stringify(allTaskLists));
+    listsRef.current = allTaskLists;
     if (allTaskLists.filter((t: TaskList) => t.deleted != true).length > 1) setIsListDeletionAllowed(true);
   }, [allTaskLists]);
 
   useEffect(() => {
     localStorage.setItem("allTasks", JSON.stringify(allTasks));
+    tasksRef.current = allTasks;
   }, [allTasks]);
 
   return (
