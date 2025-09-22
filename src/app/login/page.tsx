@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <>
-      <section className="flex flex-col items-center justify-center">
+      <section className="flex flex-col items-center justify-center mx-4">
         <h1 className="mt-8 text-center font-bold text-md">Login</h1>
         <form className="my-4 mx-4 items-center flex flex-col gap-4 w-full max-w-prose">
           <label className="font-bold w-full">Email<span className="text-red-dark">*</span>
