@@ -42,7 +42,7 @@ export default function TaskList({
     if (ref.current && isAutoFocusAllowed) {
       ref.current.select();
     }
-  }, []);
+  }, [ /* eslint-disable-line react-hooks/exhaustive-deps */ ]);
 
   return (
     <div className="m-4">

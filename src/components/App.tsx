@@ -94,7 +94,8 @@ export default function Home() {
   const syncTaskCompletion = useMemo(() => debounce((taskId: string) => {
     supabase.from("tasks").update({ completed: allTasks.find(task => task.id === taskId)?.completed }).eq("id", taskId).then(() => {
     });
-  }, 350), [])
+  }, 350), [ /* eslint-disable-line react-hooks/exhaustive-deps */ ])
+
 
   function handleTaskSubmit(taskId: string) {
     const task = allTasks.find(task => task.id === taskId);
@@ -207,7 +208,7 @@ export default function Home() {
       document.removeEventListener("visibilitychange", visibilityChangeHandler);
       window.removeEventListener("online", onReconnect);
     }
-  }, []);
+  }, [ /* eslint-disable-line react-hooks/exhaustive-deps */ ]);
 
   function fetchFromLocalStorage() {
     const savedLists: TaskList[] = JSON.parse(localStorage.getItem("allTaskLists") || "[]");

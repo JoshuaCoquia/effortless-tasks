@@ -12,7 +12,7 @@ export default async function Header() {
 
   return (
     <header className="flex p-4 align-center justify-between flex-col md:flex-row">
-      <div className="h-12 flex justify-center align-center">
+      <div className="h-12 justify-center align-center hidden md:flex">
         <h1 className="text-lg font-bold my-auto hidden md:block">Effortless Tasks</h1>
       </div>
       {user ? (
